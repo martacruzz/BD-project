@@ -3,7 +3,8 @@ name = "bd-project"
 version = "0.1.0"
 description = "Bases de Dados - Projecto Final"
 authors = [
-    "Marta Cruz <marta.dias.cruz@ua.pt>", "Pedro Martins <pedropmartins@ua.pt>"
+    { name = "Marta Cruz", email =  "marta.dias.cruz@ua.pt" }
+    { name = "Pedro Martins", email =  "pedropmartins@ua.pt" }
 ]
 readme = "README.md"
 requires-python = ">=3.11"
