@@ -3,7 +3,7 @@ name = "bd-project"
 version = "0.1.0"
 description = "Bases de Dados - Projecto Final"
 authors = [
-    { name = "Marta Cruz", email =  "marta.dias.cruz@ua.pt" }
+    { name = "Marta Cruz", email =  "marta.dias.cruz@ua.pt" },
     { name = "Pedro Martins", email =  "pedropmartins@ua.pt" }
 ]
 readme = "README.md"
@@ -11,10 +11,13 @@ requires-python = ">=3.11"
 dependencies = [
     "flask (>=3.1.0,<4.0.0)",
     "pyodbc (>=5.2.0,<6.0.0)"
+
 ]
 
 [tool.poetry]
-packages = [{include = "bd_project", from = "src"}]
+package-mode = false
+
+#packages = [{include = "bd_project", from = "src"}]
 
 
 [build-system]
