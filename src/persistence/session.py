@@ -20,7 +20,7 @@ def conn_string() -> str:
     password = config["database"]["password"]
 
     return (
-    f"DRIVER={{SQL Server}};" # change DRIVER={{SQL Server}} if not on mac
+    f"DRIVER={{ODBC Driver 18 for SQL Server}};" # change DRIVER={{ODBC Driver 18 for SQL Server}} if on mac
     f"SERVER={server};"
     f"DATABASE={db_name};"
     f"UID={username};"
