@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+
+{% block title %}Municipal - Persons{% endblock %}
+
+{% block navbar %}
+<nav class="flex justify-between items-center py-4 border-b border-gray-200 dark:border-gray-700">
+  <a href="." class="text-2xl font-bold">Municipal</a>
+  <div class="space-x-4">
+    <a href="/persons" class="hover:underline">Persons</a>
+    <a href="/institutions" class="hover:underline">Institutions</a>
+    <a href="/articles" class="hover:underline">Articles</a>
+    <a href="/topics" class="hover:underline">Topics</a>
+    <a href="/journals" class="hover:underline">Journals</a>
+  </div>
+
+  <!-- Theme Toggle Button -->
+  <div class="flex justify-end mb-4">
+    <label for="theme-toggle" class="cursor-pointer relative inline-block w-16 h-8">
+      <!-- Hidden checkbox -->
+      <input type="checkbox" id="theme-toggle" class="sr-only">
+
+      <!-- Track -->
+      <div class="absolute inset-0 bg-gray-300 dark:bg-gray-600 rounded-full transition"></div>
+
+      <!-- Thumb -->
+      <div id="toggle-thumb" class="absolute top-1 left-1 w-6 h-6 bg-white rounded-full transition-transform z-10">
+      </div>
+
+      <!-- Sun Icon -->
+      <svg id="sun-icon" xmlns="http://www.w3.org/2000/svg" class="absolute top-2 left-2 h-4 w-4 text-yellow-500 z-20"
+        fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+          d="M12 3v1m0 16v1m8.66-9h1M3.34 12h1m15.36 4.24l.71.71M4.93 4.93l.71.71m0 12.73l-.71.71M19.07 4.93l-.71.71M12 5a7 7 0 110 14a7 7 0 010-14z" />
+      </svg>
+
+      <!-- Moon Icon -->
+      <svg id="moon-icon" xmlns="http://www.w3.org/2000/svg"
+        class="absolute top-2 right-2 h-4 w-4 text-gray-800 z-20 hidden" fill="currentColor" viewBox="0 0 24 24">
+        <path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z" />
+      </svg>
+    </label>
+  </div>
+
+</nav>
+{% endblock %}
+
+{% block content %}
+<!-- Search + New Button -->
+<div class="flex items-center mt-6 space-x-2">
+  <form class="flex flex-1" method="get" hx-get="/search-persons" hx-trigger="input" hx-target=".persons-list">
+    <input class="flex-1 p-2 border rounded dark:bg-gray-800 dark:border-gray-600" type="search"
+      placeholder="Search by Name" name="query" autocomplete="off">
+    <button
+      class="ml-2 px-3 py-2 border rounded text-green-600 border-green-600 hover:bg-green-600 hover:text-white transition"
+      hx-get="/persons/new" hx-target="#content">New</button>
+  </form>
+</div>
+
+
+<!-- Content Area -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+  <div class="persons-list" hx-get="/persons-list" hx-trigger="refreshPersonList from:body">
+    {% include "person/person_list.html" %}
+  </div>
+  <div id="content"></div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+  const toggleInput = document.getElementById('theme-toggle');
+  const thumb = document.getElementById('toggle-thumb');
+  const sunIcon = document.getElementById('sun-icon');
+  const moonIcon = document.getElementById('moon-icon');
+
+  function updateThemeUI(isDark) {
+    thumb.style.transform = isDark ? 'translateX(32px)' : 'translateX(0)';
+    sunIcon.classList.toggle('hidden', isDark);
+    moonIcon.classList.toggle('hidden', !isDark);
+  }
+
+  // Initial load
+  const userTheme = localStorage.getItem('theme');
+  const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+  const isDark = userTheme === 'dark' || (!userTheme && systemPrefersDark);
+  if (isDark) {
+    document.documentElement.classList.add('dark');
+    toggleInput.checked = true;
+  }
+
+  updateThemeUI(toggleInput.checked);
+
+  // On toggle
+  toggleInput.addEventListener('change', () => {
+    const isChecked = toggleInput.checked;
+    document.documentElement.classList.toggle('dark', isChecked);
+    localStorage.setItem('theme', isChecked ? 'dark' : 'light');
+    updateThemeUI(isChecked);
+  });
+</script>
+
+{% endblock %}

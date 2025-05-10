@@ -1,11 +1,5 @@
-import sys
-sys.path.append('.')
-import random
-import string
 from typing import NamedTuple
-
 from pyodbc import IntegrityError
-
 from persistence.session import create_connection
 
 
@@ -86,4 +80,4 @@ def delete(person_cc: int):
             cursor.commit()
         except IntegrityError as ex:
             if ex.args[0] == "23000":
-                raise Exception(f"Person {person_cc} cannot be deleted. Probably has orders.") from ex
+                raise Exception(f"Person {person_cc} cannot be deleted.") from ex
