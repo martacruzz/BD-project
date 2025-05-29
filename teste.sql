@@ -19,7 +19,7 @@ create table municipal.person (
 create table municipal.app_user (
     user_id int identity(1,1),
     person_id int unique not null,
-    registration_date datetime2 default current_timestamp,
+    registration_date timestamp default current_timestamp,
     balance int,
     nif int,
     username varchar(30) unique not null,
@@ -31,7 +31,7 @@ create table municipal.app_user (
 
 create table municipal.payment (
     payment_id int identity(1,1),
-    cost decimal(10, 2),
+    cost int,
     user_id int not null,
 
     foreign key (user_id) references municipal.app_user(user_id),
@@ -120,19 +120,3 @@ create table municipal.has (
 
 
 
-
--- delete tables
-drop table if exists municipal.has;
-drop table if exists municipal.booking;
-drop table if exists municipal.sessionn;
-drop table if exists municipal.lane;
-drop table if exists municipal.monitors;
-drop table if exists municipal.pool;
-drop table if exists municipal.lifeguard;
-drop table if exists municipal.instructor;
-drop table if exists municipal.payment;
-drop table if exists municipal.app_user;
-drop table if exists municipal.person;
-
--- delete schema
-drop schema if exists municipal;
