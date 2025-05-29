@@ -115,7 +115,7 @@ create table municipal.has (
 
     foreign key (booking_id) references municipal.booking(booking_id),
     foreign key (session_id) references municipal.sessionn(session_id),
-    primary key (booking_id, session_id)
+primary key (booking_id, session_id)
 );
 
 

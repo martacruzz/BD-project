@@ -33,24 +33,24 @@ def list_all() -> list[UserDescriptor]:
     with create_connection() as conn:
         cursor = conn.cursor()
         cursor.execute("""
-                       select u.user_id, u.username, u.cc, p.name
+                       select u.user_id, u.username, u.person_id, p.name
                        from municipal.app_user as u
                        join municipal.person as p
-                       on u.cc = p.cc 
+                       on u.person_id = p.person_id 
                   """)
 
-        return list(map(lambda row: UserDescriptor(row.user_id, row.username, row.cc, row.name), cursor))
+        return list(map(lambda row: UserDescriptor(row.user_id, row.username, row.person_id, row.name), cursor))
 
 
 def read(user_id: int):
     with create_connection() as conn:
         cursor = conn.cursor()
         cursor.execute("""
-                       select u.user_id, u.cc, u.registration_date, u.balance, u.nif, u.username, u.password_hash,
+                       select u.user_id, u.person_id, u.registration_date, u.balance, u.nif, u.username, u.password_hash,
                        p.name, p.email, p.phone, p.date_of_birth, p.age, p.address
                        from municipal.app_user as u
                        join municipal.person as p
-                       on u.cc = p.cc
+                       on u.person_id = p.person_id
                        where user_id = ?;
                   """, user_id)
         row = cursor.fetchone()
@@ -60,7 +60,7 @@ def read(user_id: int):
 
         return UserDetails(
             row.user_id,
-            row.cc,
+            row.person_id,
             row.registration_date or "",
             row.balance or 0,
             row.nif or 0,
@@ -86,7 +86,7 @@ def create(user: UserDetails):
               insert into municipal.person (cc, name, email, phone, date_of_birth, age, address)
               values (?, ?, ?, ?, ?, ?, ?);
             """,
-            user.cc,
+            user.person_id,
             user.name,
             user.email,
             user.phone,
@@ -102,7 +102,7 @@ def create(user: UserDetails):
               values (?, ?, ?, ?, ?, ?, ?)
             """,
             user.user_id,
-            user.cc,
+            user.person_id,
             user.registration_date,
             user.balance,
             user.nif,
@@ -125,12 +125,12 @@ def delete(user_id: int):
             # fetch user's cc by joining app_user with person
             cursor.execute("select cc from municipal.app_user where user_id = ?", user_id)
             row = cursor.fetchone()
-            user_cc = row.cc
+            user_cc = row.person_id
             
             # delete from app_user
             cursor.execute("delete from municipal.app_user where user_id = ?", user_id)
 
-            # delete from person (?) -- maybe don't add this as we can have persons that can be users and lifeguards/instructors
+            # delete from person (?) -- maybe don't add this as we can have people that can be users and lifeguards/instructors
             # cursor.execute("delete from municipal.person where cc = ?", user_cc)
 
             cursor.commit()
