@@ -75,42 +75,42 @@ def read(user_id: int):
         )
 
 
-def create(user: UserDetails):
+# def create(user: UserDetails):
 
-    with create_connection() as conn:
-        cursor = conn.cursor()
+#     with create_connection() as conn:
+#         cursor = conn.cursor()
 
-        # insert into person
-        cursor.execute(
-            """
-              insert into municipal.person (cc, name, email, phone, date_of_birth, age, address)
-              values (?, ?, ?, ?, ?, ?, ?);
-            """,
-            user.person_id,
-            user.name,
-            user.email,
-            user.phone,
-            user.date_of_birth,
-            user.age,
-            user.address
-        )
+#         # insert into person
+#         cursor.execute(
+#             """
+#               insert into municipal.person (cc, name, email, phone, date_of_birth, age, address)
+#               values (?, ?, ?, ?, ?, ?, ?);
+#             """,
+#             user.person_id,
+#             user.name,
+#             user.email,
+#             user.phone,
+#             user.date_of_birth,
+#             user.age,
+#             user.address
+#         )
 
-        # insert into app_user
-        cursor.execute(
-            """
-              insert into municipal.app_user (user_id, cc, registration_date, balance, nif, username, password_hash)
-              values (?, ?, ?, ?, ?, ?, ?)
-            """,
-            user.user_id,
-            user.person_id,
-            user.registration_date,
-            user.balance,
-            user.nif,
-            user.username,
-            user.password_hash
-        )
+#         # insert into app_user
+#         cursor.execute(
+#             """
+#               insert into municipal.app_user (user_id, cc, registration_date, balance, nif, username, password_hash)
+#               values (?, ?, ?, ?, ?, ?, ?)
+#             """,
+#             user.user_id,
+#             user.person_id,
+#             user.registration_date,
+#             user.balance,
+#             user.nif,
+#             user.username,
+#             user.password_hash
+#         )
 
-        cursor.commit()
+#         cursor.commit()
 
 
 # TODO
@@ -137,17 +137,6 @@ def delete(user_id: int):
         except IntegrityError as ex:
             if ex.args[0] == "23000":
                 raise Exception(f"User {user_id} cannot be deleted.") from ex
-
-def generate_user_id(username: str, cc: int) -> str:
-  # combine username and cc
-    combined = f"{username}{cc}"
-
-    # generate SHA-256 hash of the combined string
-    hash_object = hashlib.sha256(combined.encode())
-    
-    # get the first 10 characters of the hex digest
-    author_id = hash_object.hexdigest()[:10]
-    return author_id
 
 def authenticate(username: str, password: str) -> UserDescriptor | None:
     """Authenticates a given user with their username and hashed password"""
