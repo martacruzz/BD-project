@@ -1,0 +1,30 @@
+<div class="text-gray-800 dark:text-gray-100">
+  <h2 class="text-2xl font-bold mb-3">{{ session.sType }} with {{ session.instructor_name }}</h2>
+
+  <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+    <div>
+      <p class="text-sm font-semibold">Date & Time</p>
+      <p>{{ session.date_time }}</p>
+    </div>
+    <div>
+      <p class="text-sm font-semibold">Duration</p>
+      <p>{{ session.duration }} minutes</p>
+    </div>
+    <div>
+      <p class="text-sm font-semibold">Instructor</p>
+      <p>{{ session.instructor_name }}</p>
+    </div>
+    <div>
+      <p class="text-sm font-semibold">Max Capacity</p>
+      <p>{{ session.max_capacity }}</p>
+    </div>
+    <div>
+      <p class="text-sm font-semibold">Pool</p>
+      <p>{{ session.pool_name }}</p>
+    </div>
+    <div>
+      <p class="text-sm font-semibold">Lane</p>
+      <p>#{{ session.lane_number }} ({{ session.lane_status }})</p>
+    </div>
+  </div>
+</div>

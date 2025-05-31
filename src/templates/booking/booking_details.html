@@ -1,0 +1,46 @@
+<div class="text-gray-800 dark:text-gray-100">
+  <h2 class="text-2xl font-bold mb-3">{{ booking.session_type }} with {{ booking.instructor_name }}</h2>
+
+  <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+    <div>
+      <p class="text-sm font-semibold">Status</p>
+      <p>{{ booking.status }}</p>
+    </div>
+    <div>
+      <p class="text-sm font-semibold">Booking Date</p>
+      <p>{{ booking.booking_date }}</p>
+    </div>
+    <div>
+      <p class="text-sm font-semibold">Session Type</p>
+      <p>{{ booking.session_type }}</p>
+    </div>
+    <div>
+      <p class="text-sm font-semibold">Session Date & Time</p>
+      <p>{{ booking.session_datetime }}</p>
+    </div>
+    <div>
+      <p class="text-sm font-semibold">Cost</p>
+      <p>€{{ "%.2f"|format(booking.cost) }}</p>
+    </div>
+    <div>
+      <p class="text-sm font-semibold">Session ID</p>
+      <p>{{ booking.session_id }}</p>
+    </div>
+    <div>
+      <p class="text-sm font-semibold">Instructor</p>
+      <p>{{ booking.instructor_name }}</p>
+    </div>
+    <div>
+      <p class="text-sm font-semibold">Pool</p>
+      <p>{{ booking.pool_name }}</p>
+    </div>
+    <div>
+      <p class="text-sm font-semibold">Lane</p>
+      <p>#{{ booking.lane_number }} ({{ booking.lane_status }})</p>
+    </div>
+    <div>
+      <p class="text-sm font-semibold">Capacity</p>
+      <p>{{ booking.booked_count }} / {{ booking.max_capacity }}</p>
+    </div>
+  </div>
+</div>

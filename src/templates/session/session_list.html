@@ -14,7 +14,8 @@
   </div>
   <div class="mt-4 sm:mt-0 flex gap-2">
     <button class="px-4 py-2 bg-gray-600 text-white text-sm rounded-lg hover:bg-gray-700 transition"
-      hx-target="#content" hx-get="/sessions/{{ session.session_id }}">
+      hx-get="/sessions/{{ session.session_id }}/details" hx-target="#sessionModalContent" hx-trigger="click"
+      hx-swap="innerHTML" onclick="openSessionModal()">
       Details
     </button>
     <!-- Book Button -->
@@ -26,4 +27,18 @@
 {% else %}
 <p class="text-gray-600 dark:text-gray-400">There are no sessions available.</p>
 {% endfor %}
+
+<!-- Session Details Modal -->
+<div id="sessionModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+  <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg max-w-lg w-full p-6 relative">
+    <button onclick="closeSessionModal()"
+      class="absolute top-4 right-4 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white font-bold text-xl"
+      aria-label="Close modal">&times;</button>
+    <div id="sessionModalContent" class="text-gray-900 dark:text-gray-100 space-y-3">
+      <!-- details will be loaded here dynamically -->
+      Loading...
+    </div>
+  </div>
+</div>
+
 {% endblock %}

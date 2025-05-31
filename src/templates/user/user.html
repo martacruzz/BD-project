@@ -68,12 +68,6 @@
     <p><span class="font-semibold">Username:</span> {{ user.username }}</p>
     <p><span class="font-semibold">Email:</span> {{ user.email }}</p>
     <p><span class="font-semibold">Card Balance:</span> €{{ user.balance }}</p>
-    <p><span class="font-semibold">Pools:</span></p>
-    <ul class="list-disc list-inside text-sm text-gray-600 dark:text-gray-300">
-      {% for pool in user.pools %}
-      <li>{{ pool.name }}</li>
-      {% endfor %}
-    </ul>
   </div>
 </div>
 {% endblock %}
@@ -109,6 +103,26 @@
     document.documentElement.classList.toggle('dark', isChecked);
     localStorage.setItem('theme', isChecked ? 'dark' : 'light');
     updateThemeUI(isChecked);
+  });
+
+  // booking details modal
+  const modal = document.getElementById('bookingModal');
+
+  function openBookingModal() {
+    modal.classList.remove('hidden');
+    modal.classList.add('flex');
+  }
+
+  function closeBookingModal() {
+    modal.classList.add('hidden');
+    modal.classList.remove('flex');
+  }
+
+  // close when clicking outside
+  modal.addEventListener('click', (e) => {
+    if (e.target === modal) {
+      closeBookingModal();
+    }
   });
 </script>
 

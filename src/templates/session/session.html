@@ -181,6 +181,26 @@
     toggleIcon.classList.toggle('rotate-180');
   });
 
+  // session details modal
+  const modal = document.getElementById('sessionModal');
+
+  function openSessionModal() {
+    modal.classList.remove('hidden');
+    modal.classList.add('flex');
+  }
+
+  function closeSessionModal() {
+    modal.classList.add('hidden');
+    modal.classList.remove('flex');
+  }
+
+  // close when clicking outside
+  modal.addEventListener('click', (e) => {
+    if (e.target === modal) {
+      closeSessionModal();
+    }
+  });
+
 
 </script>
 

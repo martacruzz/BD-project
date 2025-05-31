@@ -14,24 +14,36 @@
     </p>
   </div>
   <div class="mt-4 sm:mt-0 flex gap-2">
-    <!-- Edit Button -->
+    <!-- Details Button -->
     <button class="px-4 py-2 bg-gray-600 text-white text-sm rounded-lg hover:bg-gray-700 transition"
-      hx-target="#content" hx-get="/bookings/{{ booking.booking_id }}?edit=true">
-      Edit
+      hx-get="/bookings/{{ booking.booking_id }}/details" hx-target="#bookingModalContent" hx-trigger="click"
+      hx-swap="innerHTML" onclick="openBookingModal()">
+      Details
     </button>
     <!-- Cancel Button -->
     <button class="px-4 py-2 bg-red-600 text-white text-sm rounded-lg hover:bg-red-700 transition"
       hx-delete="/bookings/{{ booking.booking_id }}" hx-confirm="Are you sure you want to cancel this booking?">
       Cancel
     </button>
-    <!-- See More Button -->
-    <button class="px-4 py-2 bg-green-600 text-white text-sm rounded-lg hover:bg-green-700 transition"
-      hx-target="#content" hx-get="/bookings/{{ booking.booking_id }}">
-      See More
-    </button>
+
   </div>
 </div>
 {% else %}
 <p class="text-gray-600 dark:text-gray-400">You have no bookings yet.</p>
 {% endfor %}
+
+<!-- Booking Details Modal -->
+<div id="bookingModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+  <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg max-w-lg w-full p-6 relative">
+    <button onclick="closeBookingModal()"
+      class="absolute top-4 right-4 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white font-bold text-xl"
+      aria-label="Close modal">&times;</button>
+    <div id="bookingModalContent" class="text-gray-900 dark:text-gray-100 space-y-3">
+      <!-- details will be loaded here dynamically -->
+      Loading...
+    </div>
+  </div>
+</div>
+
+
 {% endblock %}

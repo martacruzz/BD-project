@@ -158,7 +158,6 @@ def authenticate(username: str, password: str) -> UserDescriptor | None:
 # TODO aqui maybe mete um procedure
 def get_user_bookings(user_id: int):
     """Get all bookings under the name of a given user"""
-    print("here")
     with create_connection() as conn:
         cursor = conn.cursor()
         cursor.execute("""
