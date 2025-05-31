@@ -238,7 +238,7 @@ end;
 
 
 
-
+-- Make payment method
 create procedure municipal.MakePayment
     -- Payment parameters
     @cost decimal(10, 2),
@@ -430,27 +430,170 @@ end;
 
 
 
-
+-- Create a booking
 create procedure municipal.createBooking
     -- Input params
-    @status varchar(30),
-    @booking_date date,
     @user_id int,
+    @session_id int
+as
+begin
+    set nocount on;
+    begin try
+        begin transaction;
 
-    -- Output param
-    @new_booking_id int
+        -- Set high isolation level to prevent concurrency issues
+        set transaction isolation level serializable;
+
+        -- 1. Validate that session exists
+        if not exists (
+            select 1
+            from municipal.sessionn
+            where session_id = @session_id
+        )
+        begin
+            rollback;
+            return 1; -- Session not found
+        end;
+
+        -- 2. Check session capacity
+        declare @max_capacity int, @current_bookings int;
+
+        select @max_capacity = max_capacity
+        from municipal.sessionn
+        where session_id = @session_id;
+
+        select @current_bookings = count(*)
+        from municipal.has h
+        join municipal.booking b on h.booking_id = b.booking_id
+        where h.session_id = @session_id;
+
+        if @current_bookings >= @max_capacity
+        begin
+            rollback;
+            return 2; -- Session full
+        end;
+
+        -- 3. Check for existing booking
+        if exists (
+            select 1
+            from municipal.unique_user_session
+            where user_id = @user_id and session_id = @session_id
+        )
+        begin
+            rollback;
+            return 3; -- Duplicate booking
+        end;
+
+        -- 4. Create booking
+        declare @booking_id int;
+
+        insert into municipal.booking (status, booking_date, user_id)
+        values ('confirmed', cast(getdate() as date), @user_id)
+
+        set @booking_id = scope_identity();
+
+        -- 5. Link booking to session
+        insert into municipal.has (booking_id, session_id)
+        values (@booking_id, @session_id);
+
+        commit transaction;
+        return 0; -- SUccess
+    end try
+    begin catch
+        if @@trancount > 0
+            rollback transaction;
+        
+        -- Handle other errors (those that weren't already)
+        return 4; -- Unexpected
+    end catch;
+
+end;
+go
+
+
+
+
+create procedure municipal.deleteUser
+    -- Input params
+    @user_id int
 
 as
 begin
 
+    set nocount on;
+    begin try
+        begin transaction;
 
+        -- Get the person_id of the user
+        declare @person_id int;
+        select @person_id = person_id
+        from municipal.app_user
+        where user_id = @user_id;
+
+        -- Exit if the user doesn't exist
+        if @person_id is null
+        begin
+            return;
+        end;
+
+        -- Backup and Delete from the junction tables (has) through booking
+        insert into municipal.deletes_has (booking_id, session_id, deleted_at)
+        select booking_id, session_id, current_timestamp
+        from municipal.has
+        where booking_id in (
+            select booking_id
+            from municipal.booking
+            where user_id = @user_id
+        );
+
+        delete from municipal.has
+        where booking_id in (
+            select booking_id
+            from municipal.booking
+            where user_id = @user_id
+        );
+
+        -- Backup and Delete user's bookings
+        insert into municipal.deletes_booking (booking_id, status, booking_date, user_id, deleted_at)
+        select booking_id, status, booking_date, user_id, current_timestamp
+        from municipal.booking
+        where user_id = @user_id;
+
+        delete from municipal.booking
+        where user_id = @user_id;
+
+        -- Backup and Delete user's payments
+        insert into municipal.deletes_payment (payment_id, cost, user_id, deleted_at)
+        select payment_id, cost, user_id, current_timestamp
+        from municipal.payment
+        where user_id = @user_id;
+
+        delete from municipal.payment
+        where user_id = @user_id;
+
+        -- Backup and Delete the user record
+        insert into municipal.deletes_app_user (user_id, person_id, registration_date, balance, nif, username, password_hash, deleted_at)
+        select user_id, person_id, registration_date, balance, nif, username, password_hash, current_timestamp
+        from municipal.app_user
+        where user_id = @user_id;
+
+        delete from municipal.app_user
+        where user_id = @user_id;
+
+        -- We don't delete the person, 
+        -- because he might want to continue being a lifeguard or intructor
+
+
+        commit transaction;
+    end try
+    begin catch
+        if @trancount > 0
+            rollback transaction
+        throw;
+    end catch;
 
 end;
-
-
-
-
-
+go
 
 
 
