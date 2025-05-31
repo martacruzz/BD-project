@@ -33,6 +33,7 @@ create table municipal.payment (
     payment_id int identity(1,1),
     cost decimal(10, 2),
     user_id int not null,
+    pay_time datetime2 default current_timestamp,
 
     foreign key (user_id) references municipal.app_user(user_id),
     primary key (payment_id)
@@ -117,6 +118,56 @@ create table municipal.has (
     foreign key (session_id) references municipal.sessionn(session_id),
 primary key (booking_id, session_id)
 );
+
+
+
+
+-- Deleted records tables
+create table municipal.deletes_app_user (
+    user_id int,
+    person_id INT,
+    registration_date DATETIME2,
+    balance INT,
+    nif INT,
+    username VARCHAR(30),
+    password_hash VARCHAR(255),
+    deleted_at DATETIME2 DEFAULT CURRENT_TIMESTAMP
+)
+
+create table municipal.deletes_payment (
+    payment_id INT,
+    cost DECIMAL(10, 2),
+    user_id INT,
+    deleted_at DATETIME2 DEFAULT CURRENT_TIMESTAMP
+)
+
+create table municipal.deletes_booking (
+    booking_id INT,
+    status VARCHAR(30),
+    booking_date DATE,
+    user_id INT,
+    deleted_at DATETIME2 DEFAULT CURRENT_TIMESTAMP
+)
+
+create table municipal.deletes_has (
+    booking_id INT,
+    session_id INT,
+    deleted_at DATETIME2 DEFAULT CURRENT_TIMESTAMP
+)
+
+
+
+-- Helper view to prevent data duplication
+create view municipal.unique_user_session
+with schemabinding
+as
+    select b.user_id, h.session_id
+    from municipal.has h
+    join municipal.booking b on h.booking_id = b.booking_id
+
+-- Enforce uniqueness
+create unique clustered index UQ_User_session
+on municipal.unique_user_session(user_id, session_id)
 
 
 
