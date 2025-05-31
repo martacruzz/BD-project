@@ -22,16 +22,18 @@ def list_user_payments(user_id: int) -> list[PaymentDescriptor]:
     with create_connection() as conn:
       cursor = conn.cursor()
       cursor.execute("""
-          SELECT p.payment_id, p.cost, p.registration_date,
-                  p.booking_id,
-                  s.sType AS session_type,
-                  s.date_time AS session_date
-          FROM municipal.payment p
-          LEFT JOIN municipal.booking b ON p.booking_id = b.booking_id
-          LEFT JOIN municipal.sessionn s ON b.session_id = s.session_id
-          WHERE p.user_id = ?
-          ORDER BY p.registration_date DESC;
+        SELECT p.payment_id, p.cost, p.pay_time,
+              b.booking_id,
+              s.sType AS session_type,
+              s.date_time AS session_date
+        FROM municipal.payment p
+        LEFT JOIN municipal.booking b ON p.user_id = b.user_id
+        LEFT JOIN municipal.has h ON b.booking_id = h.booking_id
+        LEFT JOIN municipal.sessionn s ON h.session_id = s.session_id
+        WHERE p.user_id = ?
+        ORDER BY p.pay_time DESC;
       """, user_id)
+
 
       rows = cursor.fetchall()
       return [PaymentDescriptor(*row) for row in rows]
@@ -55,10 +57,10 @@ def list_payments_by_month(user_id: int) -> dict[str, float]:
     with create_connection() as conn:
       cursor = conn.cursor()
       cursor.execute("""
-        SELECT FORMAT(registration_date, 'yyyy-MM') AS month, SUM(cost) AS total
+        SELECT FORMAT(pay_time, 'yyyy-MM') AS month, SUM(cost) AS total
         FROM municipal.payment
         WHERE user_id = ?
-        GROUP BY FORMAT(registration_date, 'yyyy-MM')
+        GROUP BY FORMAT(pay_time, 'yyyy-MM')
         ORDER BY month DESC;
       """, user_id)
 

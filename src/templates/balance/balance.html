@@ -30,11 +30,9 @@
 </nav>
 {% endblock %}
 
-{% extends "base.html" %}
-
 {% block content %}
 <div class="container mx-auto px-4 py-6">
-  <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-6">Saldo e Pagamentos</h1>
+  <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-6">Balance and Payments</h1>
 
   <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
     <!-- Payments list -->
@@ -46,7 +44,7 @@
     <div class="flex flex-col space-y-6">
       <!-- Total Paid -->
       <div class="bg-white dark:bg-gray-800 rounded-xl shadow p-6">
-        <h2 class="text-xl font-bold text-gray-900 dark:text-white mb-2">Saldo Total Gasto</h2>
+        <h2 class="text-xl font-bold text-gray-900 dark:text-white mb-2">Total Spent</h2>
         <p class="text-2xl font-semibold text-green-600 dark:text-green-400">
           €{{ total_paid }}
         </p>
@@ -54,7 +52,7 @@
 
       <!-- Monthly Summary -->
       <div class="bg-white dark:bg-gray-800 rounded-xl shadow p-6">
-        <h2 class="text-xl font-bold text-gray-900 dark:text-white mb-4">Pagamentos por Mês</h2>
+        <h2 class="text-xl font-bold text-gray-900 dark:text-white mb-4">Payments by Month</h2>
         <ul class="divide-y divide-gray-200 dark:divide-gray-700">
           {% for month, amount in monthly_summary.items() %}
           <li class="py-2 flex justify-between">
@@ -67,16 +65,16 @@
 
       <!-- Load Card Form -->
       <div class="bg-white dark:bg-gray-800 rounded-xl shadow p-6">
-        <h2 class="text-xl font-bold text-gray-900 dark:text-white mb-4">Carregar Cartão</h2>
+        <h2 class="text-xl font-bold text-gray-900 dark:text-white mb-4">Load Card</h2>
         <form action="/payments/add" method="post" class="space-y-4">
           <div>
-            <label for="amount" class="block text-sm font-medium text-gray-700 dark:text-gray-200">Valor (€)</label>
+            <label for="amount" class="block text-sm font-medium text-gray-700 dark:text-gray-200">Amount (€)</label>
             <input type="number" name="amount" id="amount" step="0.01" min="1"
               class="mt-1 block w-full border-gray-300 dark:border-gray-700 rounded-md shadow-sm dark:bg-gray-700 dark:text-white"
               required>
           </div>
           <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-            Carregar
+            Load
           </button>
         </form>
       </div>
@@ -84,7 +82,6 @@
   </div>
 </div>
 {% endblock %}
-
 
 {% block extra_scripts %}
 <script>
