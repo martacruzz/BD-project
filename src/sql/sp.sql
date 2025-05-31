@@ -432,6 +432,17 @@ end;
 
 -- Create a booking
 create procedure municipal.createBooking
+
+    -- Return parameters explinations
+    -- 0 => Success
+    -- 1 => Session not found
+    -- 2 => Session full
+    -- 3 => Duplicate booking
+    -- 4 => Unexpected
+    -- 5 => User not found
+    -- 6 => User doesn't have enough money
+    -- 7 => Unknown session type
+
     -- Input params
     @user_id int,
     @session_id int
@@ -451,14 +462,16 @@ begin
             where session_id = @session_id
         )
         begin
-            rollback;
+            rollback transaction;
+            set transaction isolation level read commited;
             return 1; -- Session not found
         end;
 
-        -- 2. Check session capacity
-        declare @max_capacity int, @current_bookings int;
 
-        select @max_capacity = max_capacity
+        -- 2. Check session capacity
+        declare @max_capacity int, @sType varchar(30), @current_bookings int;
+
+        select @max_capacity = max_capacity, @sType = sType
         from municipal.sessionn
         where session_id = @session_id;
 
@@ -469,9 +482,11 @@ begin
 
         if @current_bookings >= @max_capacity
         begin
-            rollback;
+            rollback transaction;
+            set transaction isolation level read commited;
             return 2; -- Session full
         end;
+
 
         -- 3. Check for existing booking
         if exists (
@@ -480,11 +495,60 @@ begin
             where user_id = @user_id and session_id = @session_id
         )
         begin
-            rollback;
+            rollback transaction;
+            set transaction isolation level read commited;
             return 3; -- Duplicate booking
         end;
 
-        -- 4. Create booking
+
+        -- 4. Check if the user exists and get balance
+        declare @user_balance decimal(10, 2);
+
+        select @user_balance = balance
+        from municipal.app_user
+        where user_id = @user_id;
+
+        if @user_balance is null
+        begin
+            rollback transaction;
+            set transaction isolation level read commited;
+            return 5; -- User not found
+        end;
+
+
+        -- 5. Check if the user ain't broke (if balance is enough)
+        declare @session_price decimal(10, 2);
+
+        if @sType = 'free'
+            set @session_price = 1 -- 1€ entrance fee
+
+        else if @sType = 'aerobics'
+            set @session_price = 5 -- 5€ aerobics
+
+        else if @sType = 'class'
+            set @session_price = 3 -- 3€ class
+
+        else
+        begin
+            rollback transaction;
+            set transaction isolation level read commited;
+            return 7; -- Unknown session type
+        end;
+
+        if @user_balance - @session_price < 0
+        begin
+            rollback transaction;
+            set transaction isolation level read commited;
+            return 6; -- Broke ass
+        end;
+
+
+        -- 6. Deduct from account (create negative payment)
+        insert into municipal.payment (cost, user_id)
+        values (-@session_price, @user_id);
+
+
+        -- 7. Create booking
         declare @booking_id int;
 
         insert into municipal.booking (status, booking_date, user_id)
@@ -492,16 +556,23 @@ begin
 
         set @booking_id = scope_identity();
 
-        -- 5. Link booking to session
+        -- 8. Link booking to session
         insert into municipal.has (booking_id, session_id)
         values (@booking_id, @session_id);
 
         commit transaction;
-        return 0; -- SUccess
+
+        -- Reset isolation level back to read commited
+        set transaction isolation level read commited;
+
+        return 0; -- Success
     end try
     begin catch
         if @@trancount > 0
             rollback transaction;
+
+        -- Reset isolation level back to read commited
+        set transaction isolation level read commited;
         
         -- Handle other errors (those that weren't already)
         return 4; -- Unexpected

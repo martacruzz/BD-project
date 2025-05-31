@@ -20,7 +20,7 @@ create table municipal.app_user (
     user_id int identity(1,1),
     person_id int unique not null,
     registration_date datetime2 default current_timestamp,
-    balance int,
+    balance decimal(10, 2),
     nif int,
     username varchar(30) unique not null,
     password_hash varchar(255) not null,
