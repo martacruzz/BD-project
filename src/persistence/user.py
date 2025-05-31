@@ -148,3 +148,41 @@ def generate_user_id(username: str, cc: int) -> str:
     # get the first 10 characters of the hex digest
     author_id = hash_object.hexdigest()[:10]
     return author_id
+
+def authenticate(username: str, password: str) -> UserDescriptor | None:
+    """Authenticates a given user with their username and hashed password"""
+
+    with create_connection() as conn:
+        cursor = conn.cursor()
+        cursor.execute("""
+            select u.user_id, u.username, p.cc, p.name, u.password_hash
+            from municipal.app_user as u
+            join municipal.person as p on u.person_id = p.person_id
+            where u.username = ?
+        """, username)
+
+        row = cursor.fetchone()
+        if row and hashlib.sha256(password.encode()).hexdigest() == row.password_hash:
+            return UserDescriptor(row.user_id, row.username, row.cc, row.name)
+        return None
+    
+# TODO aqui maybe mete um procedure
+def get_user_bookings(user_id: int):
+    """Get all bookings under the name of a given user"""
+    with create_connection() as conn:
+        cursor = conn.cursor()
+        cursor.execute("""
+            select b.booking_id, b.status, b.booking_date,
+                   s.session_id, s.date_time, s.sType, s.duration, s.max_capacity,
+                   i.instructor_id, p.name as instructor_name,
+                   s.lane_number, s.pool_id
+            from municipal.booking b
+            join municipal.has h on b.booking_id = h.booking_id
+            join municipal.sessionn s on h.session_id = s.session_id
+            join municipal.instructor i on s.instructor_id = i.instructor_id
+            join municipal.person p on i.person_id = p.person_id
+            where b.user_id = ?
+        """, user_id)
+        return cursor.fetchall()
+
+
