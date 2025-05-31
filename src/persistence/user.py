@@ -74,43 +74,43 @@ def read(user_id: int):
             row.address or ""
         )
 
+# TODO implememt with trigger to check for duplicates and invalid values
+def create(user: UserDetails):
 
-# def create(user: UserDetails):
+    with create_connection() as conn:
+        cursor = conn.cursor()
 
-#     with create_connection() as conn:
-#         cursor = conn.cursor()
+        # insert into person
+        cursor.execute(
+            """
+              insert into municipal.person (cc, name, email, phone, date_of_birth, age, address)
+              values (?, ?, ?, ?, ?, ?, ?);
+            """,
+            user.person_id,
+            user.name,
+            user.email,
+            user.phone,
+            user.date_of_birth,
+            user.age,
+            user.address
+        )
 
-#         # insert into person
-#         cursor.execute(
-#             """
-#               insert into municipal.person (cc, name, email, phone, date_of_birth, age, address)
-#               values (?, ?, ?, ?, ?, ?, ?);
-#             """,
-#             user.person_id,
-#             user.name,
-#             user.email,
-#             user.phone,
-#             user.date_of_birth,
-#             user.age,
-#             user.address
-#         )
+        # insert into app_user
+        cursor.execute(
+            """
+              insert into municipal.app_user (user_id, cc, registration_date, balance, nif, username, password_hash)
+              values (?, ?, ?, ?, ?, ?, ?)
+            """,
+            user.user_id,
+            user.person_id,
+            user.registration_date,
+            user.balance,
+            user.nif,
+            user.username,
+            user.password_hash
+        )
 
-#         # insert into app_user
-#         cursor.execute(
-#             """
-#               insert into municipal.app_user (user_id, cc, registration_date, balance, nif, username, password_hash)
-#               values (?, ?, ?, ?, ?, ?, ?)
-#             """,
-#             user.user_id,
-#             user.person_id,
-#             user.registration_date,
-#             user.balance,
-#             user.nif,
-#             user.username,
-#             user.password_hash
-#         )
-
-#         cursor.commit()
+        cursor.commit()
 
 
 # TODO
@@ -158,6 +158,7 @@ def authenticate(username: str, password: str) -> UserDescriptor | None:
 # TODO aqui maybe mete um procedure
 def get_user_bookings(user_id: int):
     """Get all bookings under the name of a given user"""
+    print("here")
     with create_connection() as conn:
         cursor = conn.cursor()
         cursor.execute("""

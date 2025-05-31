@@ -16,6 +16,7 @@ def add_payment(user_id: int, cost: float, booking_id: int) -> int:
     """Adds a payment entry and returns the new payment_id."""
     raise NotImplementedError()
 
+# TODO implement with udf
 def list_user_payments(user_id: int) -> list[PaymentDescriptor]:
     """Gives us all payments made by a given user by id"""
     with create_connection() as conn:

@@ -1,0 +1,24 @@
+<div class="bg-white dark:bg-gray-800 rounded-xl shadow p-6">
+  <h2 class="text-xl font-bold text-gray-900 dark:text-white mb-4">Histórico de Pagamentos</h2>
+  {% if payments %}
+  <ul class="divide-y divide-gray-200 dark:divide-gray-700">
+    {% for payment in payments %}
+    <li class="py-2">
+      <div class="flex justify-between">
+        <div>
+          <p class="font-semibold text-gray-900 dark:text-white">
+            €{{ payment.cost }} - {{ payment.session_type }}
+          </p>
+          <p class="text-sm text-gray-500 dark:text-gray-400">
+            {{ payment.session_date }} | Pagamento em: {{ payment.date }}
+          </p>
+        </div>
+        <span class="text-sm text-gray-700 dark:text-gray-300">#{{ payment.payment_id }}</span>
+      </div>
+    </li>
+    {% endfor %}
+  </ul>
+  {% else %}
+  <p class="text-gray-500 dark:text-gray-400">Sem pagamentos registados.</p>
+  {% endif %}
+</div>
