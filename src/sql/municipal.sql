@@ -158,12 +158,14 @@ create table municipal.deletes_has (
 
 
 -- Helper view to prevent data duplication
+go
 create view municipal.unique_user_session
 with schemabinding
 as
     select b.user_id, h.session_id
     from municipal.has h
     join municipal.booking b on h.booking_id = b.booking_id
+go
 
 -- Enforce uniqueness
 create unique clustered index UQ_User_session
