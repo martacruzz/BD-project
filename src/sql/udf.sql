@@ -22,9 +22,9 @@ return (
         po.name as pool_name,
         l.status as lane_status
     from municipal.sessionn s
-    left join municipal.instructor i as s.instructor_id = i.instructor_id
+    left join municipal.instructor i on s.instructor_id = i.instructor_id
     left join municipal.person p on i.person_id = p.person_id
-    join municipal.lane l on s.pool_id = l.pool_id ans s.lane_number = l.lane_number
+    join municipal.lane l on s.pool_id = l.pool_id and s.lane_number = l.lane_number
     join municipal.pool po on s.pool_id = po.pool_id
     where
         (@sType is null or s.sType = @sType) -- Apply filters if they exist
@@ -33,9 +33,9 @@ return (
             (@duration_min is null and @duration_max is null) or
             (s.duration between coalesce(@duration_min, 0) and coalesce(@duration_max, 2147483647))
         )
-        and (@search_date is null or cast(s.data_time as date) = @search_date)
+        and (@search_date is null or cast(s.date_time as date) = @search_date)
 );
-
+go
 
 
 -- Payment history

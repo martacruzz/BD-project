@@ -89,11 +89,11 @@ begin
         end
     end catch
 end;
+go
 
 
 
-
--- Add a intructor
+-- Add an instructor
 create procedure municipal.CreateInstructor
     -- Person parameters
     @cc varchar(12),
@@ -164,7 +164,7 @@ begin
 
     end catch
 end;
-
+go
 
 
 -- Add a Lifeguard
@@ -235,6 +235,7 @@ begin
 
     end catch
 end;
+go
 
 
 
@@ -281,6 +282,7 @@ begin
 
     end catch
 end;
+go
 
 
 
@@ -323,6 +325,7 @@ begin
     end catch
 
 end;
+go
 
 
 
@@ -366,6 +369,7 @@ begin
     end catch
 
 end;
+go
 
 
 
@@ -391,7 +395,7 @@ begin
         begin transaction
 
             -- Insert values into session table
-            insert into (
+            insert into municipal.sessionn (
                 duration,
                 date_time,
                 sType,
@@ -427,13 +431,14 @@ begin
     end catch
 
 end;
+go
 
 
 
 -- Create a booking
 create procedure municipal.createBooking
 
-    -- Return parameters explinations
+    -- Return parameters explanations
     -- 0 => Success
     -- 1 => Session not found
     -- 2 => Session full
@@ -463,7 +468,7 @@ begin
         )
         begin
             rollback transaction;
-            set transaction isolation level read commited;
+            set transaction isolation level read committed;
             return 1; -- Session not found
         end;
 
@@ -483,7 +488,7 @@ begin
         if @current_bookings >= @max_capacity
         begin
             rollback transaction;
-            set transaction isolation level read commited;
+            set transaction isolation level read committed;
             return 2; -- Session full
         end;
 
@@ -496,7 +501,7 @@ begin
         )
         begin
             rollback transaction;
-            set transaction isolation level read commited;
+            set transaction isolation level read committed;
             return 3; -- Duplicate booking
         end;
 
@@ -511,7 +516,7 @@ begin
         if @user_balance is null
         begin
             rollback transaction;
-            set transaction isolation level read commited;
+            set transaction isolation level read committed;
             return 5; -- User not found
         end;
 
@@ -531,14 +536,14 @@ begin
         else
         begin
             rollback transaction;
-            set transaction isolation level read commited;
+            set transaction isolation level read committed;
             return 7; -- Unknown session type
         end;
 
         if @user_balance - @session_price < 0
         begin
             rollback transaction;
-            set transaction isolation level read commited;
+            set transaction isolation level read committed;
             return 6; -- Broke ass
         end;
 
@@ -562,8 +567,8 @@ begin
 
         commit transaction;
 
-        -- Reset isolation level back to read commited
-        set transaction isolation level read commited;
+        -- Reset isolation level back to read committed
+        set transaction isolation level read committed;
 
         return 0; -- Success
     end try
@@ -571,9 +576,9 @@ begin
         if @@trancount > 0
             rollback transaction;
 
-        -- Reset isolation level back to read commited
-        set transaction isolation level read commited;
-        
+        -- Reset isolation level back to read committed
+        set transaction isolation level read committed;
+
         -- Handle other errors (those that weren't already)
         return 4; -- Unexpected
     end catch;
@@ -651,32 +656,17 @@ begin
         delete from municipal.app_user
         where user_id = @user_id;
 
-        -- We don't delete the person, 
-        -- because he might want to continue being a lifeguard or intructor
+        -- We don't delete the person,
+        -- because he might want to continue being a lifeguard or instructor
 
 
         commit transaction;
     end try
     begin catch
-        if @trancount > 0
+        if @@trancount > 0
             rollback transaction
         throw;
     end catch;
 
 end;
 go
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

@@ -170,22 +170,3 @@ go
 -- Enforce uniqueness
 create unique clustered index UQ_User_session
 on municipal.unique_user_session(user_id, session_id)
-
-
-
-
--- delete tables
-drop table if exists municipal.has;
-drop table if exists municipal.booking;
-drop table if exists municipal.sessionn;
-drop table if exists municipal.lane;
-drop table if exists municipal.monitors;
-drop table if exists municipal.pool;
-drop table if exists municipal.lifeguard;
-drop table if exists municipal.instructor;
-drop table if exists municipal.payment;
-drop table if exists municipal.app_user;
-drop table if exists municipal.person;
-
--- delete schema
-drop schema if exists municipal;
