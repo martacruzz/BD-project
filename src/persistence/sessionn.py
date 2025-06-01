@@ -31,6 +31,7 @@ def list_all() -> list[SessionDescriptor]:
   """Lists all sessions in the db"""
   with create_connection() as conn:
     cursor = conn.cursor()
+    
     cursor.execute("""
       SELECT s.session_id, s.sType, s.date_time,
               p.name AS instructor_name,
@@ -43,12 +44,47 @@ def list_all() -> list[SessionDescriptor]:
       JOIN municipal.lane l ON s.pool_id = l.pool_id AND s.lane_number = l.lane_number
       ORDER BY s.date_time;
     """)
+
     return [SessionDescriptor(*row) for row in cursor.fetchall()]
 
-# TODO implement with procedure 
-def filter_sessions(sType: str = None, instructor_id: int = None, date: str = None) -> list[SessionDescriptor]:
+def filter_sessions(
+    sType: str = None, 
+    instructor_name: str = None, 
+    duration_min: int = None, 
+    duration_max: int = None, 
+    search_date: str = None
+  ) -> list[SessionDescriptor]:
   """Lists all sessions that apply with a certain filter"""
-  raise NotImplementedError()
+
+  with create_connection() as conn:
+    cursor = conn.cursor()
+    
+    # Call the UDF with filtered parameters
+    cursor.execute("""
+      select 
+        session_id,
+        duration,
+        date_time,
+        sType,
+        max_capacity,
+        instructor_id,
+        instructor_name,
+        lane_number,
+        pool_id,
+        pool_name,
+        lane_status
+      from municipal.SearchSessions(?, ?, ?, ?, ?)
+      order by date_time;
+    """, (sType, instructor_name, duration_min, duration_max, search_date))
+
+    rows = cursor.fetchall()
+
+    if not rows:
+      return []
+
+    return [SessionDescriptor(*row) for row in rows]
+
+
 
 
 def read(session_id: int) -> SessionDetails | None:

@@ -19,10 +19,34 @@ class BookingDetails(NamedTuple):
   max_capacity: int
   booked_count: int
 
-# TODO implement with trigger
+# Implemented with SP (the SP makes all the verifications needed)
 def create_booking(user_id: int, session_id: int) -> bool:
-  """Creates a booking with all security checks"""
-  raise NotImplementedError()
+  """Calls the createBooking SP that creates a booking with all security checks"""
+  with create_connection() as conn:
+    cursor = conn.cursor()
+
+    # Call SP and capture return code
+    cursor.execute("""
+      declare @rc int;
+      exec @rc = municipal.createBooking
+        @user_id = ?,
+        @session_id = ?
+      select @rc;
+    """, (user_id, session_id))
+
+    # Fetch the SP's return code
+    row = cursor.fetchone()
+    if not row:
+      return False
+    
+    rc = row[0] # integer 0-7
+
+    # Commit is safe, since the SP handles it's own transaction rollback
+    conn.commit()
+
+    return (rc == 0) # 0 is the success value, anything else is failure
+
+
 
 def get_booking_details(booking_id: int) -> BookingDetails | None:
   """Gets the details of a given booking by id"""

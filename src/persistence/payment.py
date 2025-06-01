@@ -11,45 +11,61 @@ class PaymentDescriptor(NamedTuple):
   session_type: str
   session_date: str
 
-# TODO implement with trigger
-def add_payment(user_id: int, cost: float, booking_id: int) -> int:
+# Create a payment (there is a trigger to make sure the balance isn't negative)
+def add_payment(user_id: int, cost: float) -> int:
     """Adds a payment entry and returns the new payment_id."""
-    raise NotImplementedError()
-
-# TODO implement with udf
-def list_user_payments(user_id: int) -> list[PaymentDescriptor]:
-    """Gives us all payments made by a given user by id"""
     with create_connection() as conn:
       cursor = conn.cursor()
+
+      # Prepare output variable
+      new_payment_id = cursor.execute("""
+        declare @new_payment_id int;
+        
+        exec municipal.MakePayment
+          @user_id = ?,
+          @cost = ?,
+          @new_payment_id = @new_payment_id output;
+          
+        select @new_payment_id;
+      """, (user_id, cost)).fetchone()[0]
+
+      return new_payment_id
+
+
+
+# History of all user payments (with UDF)
+def list_user_payments(user_id: int) -> list[PaymentDescriptor]:
+    """Gives us all payments made by a given user by id"""
+
+    with create_connection() as conn:
+      cursor = conn.cursor()
+
       cursor.execute("""
-        SELECT p.payment_id, p.cost, p.pay_time,
-              b.booking_id,
-              s.sType AS session_type,
-              s.date_time AS session_date
-        FROM municipal.payment p
-        LEFT JOIN municipal.booking b ON p.user_id = b.user_id
-        LEFT JOIN municipal.has h ON b.booking_id = h.booking_id
-        LEFT JOIN municipal.sessionn s ON h.session_id = s.session_id
-        WHERE p.user_id = ?
-        ORDER BY p.pay_time DESC;
+        select payment_id, cost, pay_time,
+        from municipal.PaymentHistory(?)
+        order by pay_time desc;
       """, user_id)
 
 
       rows = cursor.fetchall()
       return [PaymentDescriptor(*row) for row in rows]
 
-
+# Only adds negative payments (so the amount the user spent) (uses the history UDF)
 def total_paid_by_user(user_id: int) -> float:
     """Gives us the total amount spent by the user with all the payments they made"""
     with create_connection() as conn:
       cursor = conn.cursor()
       cursor.execute("""
           SELECT SUM(cost)
-          FROM municipal.payment
-          WHERE user_id = ?;
+          FROM municipal.PaymentHistory(?)
+          WHERE cost < 0;
       """, user_id)
-      total = cursor.fetchone()[0]
-      return total if total else 0.0
+
+      row = cursor.fetchone()
+      negative_sum = row[0] if row and row[0] is not None else 0.0
+
+      # Return the absulute value
+      return abs(negative_sum)
 
 
 def list_payments_by_month(user_id: int) -> dict[str, float]:

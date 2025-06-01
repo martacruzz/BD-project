@@ -54,6 +54,15 @@ ELSE IF OBJECT_ID('municipal.PaymentHistory', 'TF') IS NOT NULL
 ELSE IF OBJECT_ID('municipal.PaymentHistory', 'IF') IS NOT NULL
     DROP FUNCTION municipal.PaymentHistory;
 
+-- If UserBookings is a scalar function (FN), a multi‐statement TVF (TF),
+-- or an inline TVF (IF), drop it accordingly:
+IF OBJECT_ID('municipal.UserBookings', 'FN') IS NOT NULL
+    DROP FUNCTION municipal.UserBookings;
+ELSE IF OBJECT_ID('municipal.UserBookings', 'TF') IS NOT NULL
+    DROP FUNCTION municipal.UserBookings;
+ELSE IF OBJECT_ID('municipal.UserBookings', 'IF') IS NOT NULL
+    DROP FUNCTION municipal.UserBookings;
+
 -- Drop Indexes on Views First
 IF EXISTS (
     SELECT 1

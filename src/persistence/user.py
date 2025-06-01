@@ -74,43 +74,67 @@ def read(user_id: int):
             row.address or ""
         )
 
-# TODO implememt with trigger to check for duplicates and invalid values
+# Uses Stored Procedure to create a user
 def create(user: UserDetails):
 
-    with create_connection() as conn:
-        cursor = conn.cursor()
+    try:
+        with create_connection() as conn:
+            cursor = conn.cursor()
 
-        # insert into person
-        cursor.execute(
+            # Create new user with stored procedure
+            sql = """
+            declare @new_person_id int, @new_user_id int;
+
+            exec municipal.CreateUser
+                @cc            = ?,
+                @name          = ?,
+                @email         = ?,
+                @phone         = ?,
+                @date_of_birth = ?,
+                @address       = ?,
+                @nif           = ?,
+                @username      = ?,
+                @password_hash = ?,
+                @new_person_id = @new_person_id OUTPUT,
+                @new_user_id   = @new_user_id OUTPUT;
+
+            select
+                @new_person_id as new_person_id,
+                @new_user_id as new_user_id;
+
             """
-              insert into municipal.person (cc, name, email, phone, date_of_birth, age, address)
-              values (?, ?, ?, ?, ?, ?, ?);
-            """,
-            user.person_id,
-            user.name,
-            user.email,
-            user.phone,
-            user.date_of_birth,
-            user.age,
-            user.address
-        )
 
-        # insert into app_user
-        cursor.execute(
-            """
-              insert into municipal.app_user (user_id, cc, registration_date, balance, nif, username, password_hash)
-              values (?, ?, ?, ?, ?, ?, ?)
-            """,
-            user.user_id,
-            user.person_id,
-            user.registration_date,
-            user.balance,
-            user.nif,
-            user.username,
-            user.password_hash
-        )
+            cursor.execute(
+                sql,
+                user.cc,
+                user.name,
+                user.email,
+                user.phone,
+                user.date_of_birth,
+                user.address,
+                user.nif,
+                user.username,
+                user.password_hash
+            )
 
-        cursor.commit()
+            # Fetch the result of selected
+            row = cursor.fetchone()
+            if row is None:
+                # Shouldn't be happening
+                raise RuntimeError("Stored Procedure didn't return new IDs")
+            
+            new_person_id, new_user_id = row.new_person_id, row.new_user_id
+
+            # Commit transaction
+            conn.commit()
+
+            # Return the output (optional, since you kinda don't need it)
+            return new_person_id, new_user_id
+        
+    except pyodbc.DatabaseError as ex:
+        raise
+    except Exception:
+        raise
 
 
 # TODO
@@ -118,25 +142,25 @@ def update(user_id: int, user: UserDetails):
     raise NotImplementedError()
 
 
+# Uses procedure to delete user
 def delete(user_id: int):
     with create_connection() as conn:
         cursor = conn.cursor()
         try:
-            # fetch user's cc by joining app_user with person
-            cursor.execute("select cc from municipal.app_user where user_id = ?", user_id)
-            row = cursor.fetchone()
-            user_cc = row.person_id
             
-            # delete from app_user
-            cursor.execute("delete from municipal.app_user where user_id = ?", user_id)
+            # Execute the stored procedure
+            cursor.execute(
+                "Exec municipal.deleteUser @user_id = ?;",
+                user_id
+            )
 
-            # delete from person (?) -- maybe don't add this as we can have people that can be users and lifeguards/instructors
-            # cursor.execute("delete from municipal.person where cc = ?", user_cc)
+            conn.commit()
 
-            cursor.commit()
         except IntegrityError as ex:
             if ex.args[0] == "23000":
                 raise Exception(f"User {user_id} cannot be deleted.") from ex
+
+
 
 def authenticate(username: str, password: str) -> UserDescriptor | None:
     """Authenticates a given user with their username and hashed password"""
@@ -155,23 +179,21 @@ def authenticate(username: str, password: str) -> UserDescriptor | None:
             return UserDescriptor(row.user_id, row.username, row.cc, row.name)
         return None
     
-# TODO aqui maybe mete um procedure
+# Uses a procedure to get the user's bookings (only those in the future)
+# This is not a history
 def get_user_bookings(user_id: int):
     """Get all bookings under the name of a given user"""
     with create_connection() as conn:
         cursor = conn.cursor()
+        
         cursor.execute("""
-            select b.booking_id, b.status, b.booking_date,
-                   s.session_id, s.date_time, s.sType, s.duration, s.max_capacity,
-                   i.instructor_id, p.name as instructor_name,
-                   s.lane_number, s.pool_id
-            from municipal.booking b
-            join municipal.has h on b.booking_id = h.booking_id
-            join municipal.sessionn s on h.session_id = s.session_id
-            join municipal.instructor i on s.instructor_id = i.instructor_id
-            join municipal.person p on i.person_id = p.person_id
-            where b.user_id = ?
-        """, user_id)
+            select booking_id, status, booking_date,
+                session_id, session_datetime, session_type,
+                session_duration, session_capacity,
+                session_lane, session_pool, instructor_name
+            from municipal.UserBookings(?)
+            """, user_id)
+
         return cursor.fetchall()
 
 

@@ -52,3 +52,40 @@ return (
     from municipal.payment
     where user_id = @user_id
 );
+go
+
+
+-- Bookings the user has
+create function municipal.UserBookings (
+    @user_id int
+)
+returns table
+with shemabinding
+as
+return
+(
+    select
+        b.booking_id,
+        b.status,
+        b.booking_date,
+        h.session_id,
+        s.date_time as session_datetime,
+        s.sType as session_type,
+        s.duration as session_duration,
+        s.max_capacity as session_capacity,
+        s.lane_number as session_lane,
+        s.pool_id as session_pool,
+        p.name as instructor_name
+    from municipal.booking as b
+    join municipal.has as h
+        on b.booking_id = h.booking_id
+    join municipal.sessionn as s
+        on h.session_id = s.session_id
+    join municipal.instructor as i
+        on s.instructor_id = i.instructor_id
+    join municipal.person as p
+        on i.person_id = p.person_id
+    where b.user_id = @user_id
+        and s.date_time > getdate() -- Only future sessions
+);
+go
