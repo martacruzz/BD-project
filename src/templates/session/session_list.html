@@ -3,6 +3,8 @@
 {% block title %}SwiM - Sessions{% endblock %}
 
 {% block content %}
+
+<div id="session-list">
 {% for session in sessions %}
 <div
   class="bg-white dark:bg-gray-800 rounded-2xl shadow-md p-6 mb-4 flex flex-col sm:flex-row justify-between items-start sm:items-center hover:shadow-lg transition">
@@ -19,7 +21,10 @@
       Details
     </button>
     <!-- Book Button -->
-    <button class="px-4 py-2 bg-green-600 text-white text-sm rounded-lg hover:bg-green-700 transition">
+    <button class="px-4 py-2 bg-green-600 text-white text-sm rounded-lg hover:bg-green-700 transition"
+      hx-post="/sessions/add-to-cart"
+      hx-vals='{"session_id": "{{session.session_id}}"}'
+      hx-swap="innerHTML">
       Book
     </button>
   </div>
@@ -27,6 +32,7 @@
 {% else %}
 <p class="text-gray-600 dark:text-gray-400">There are no sessions available.</p>
 {% endfor %}
+</div>
 
 <!-- Session Details Modal -->
 <div id="sessionModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">

@@ -77,3 +77,30 @@ def get_booking_details(booking_id: int) -> BookingDetails | None:
     if row:
       return BookingDetails(*row)
     return None
+
+
+def delete_booking(booking_id: int) -> bool:
+  """ Calls the deleteBooking SP, who handles all the logic"""
+  with create_connection() as conn:
+    cursor = conn.cursor()
+
+    try:
+      # Call SP and capture return value
+      cursor.execute("""
+        declare @rc int;
+        exec @rc = municipal.deleteBooking @booking_id = ?;
+        select @rc;
+      """, (booking_id))
+
+      # Fetch the return code
+      row = cursor.fetchone()
+      if not row:
+        return False
+      
+      return_code = row[0]
+
+      return return_code == 0  # 0 means success
+    
+    except Exception as e:
+      print(f"Error deleting booking {booking_id}: {str(e)}")
+      raise

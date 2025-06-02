@@ -1,6 +1,7 @@
 import datetime
 import hashlib
 from flask import Flask, render_template, request, make_response, g
+import secrets
 
 from routes.bookings import bp as bookings_bp
 from routes.sessions import bp as sessions_bp
@@ -9,6 +10,10 @@ from routes.balance import bp as balance_bp
 from persistence import user
 
 app = Flask(__name__)
+
+# Generate a random 32‐byte key and assign it
+app.secret_key = secrets.token_hex(32)
+
 app.register_blueprint(bookings_bp)
 app.register_blueprint(sessions_bp)
 app.register_blueprint(balance_bp)

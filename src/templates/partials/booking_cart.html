@@ -1,0 +1,23 @@
+{% if sessions %}
+<ul class="space-y-3">
+    {% for session in sessions %}
+    <li class="flex justify-between items-center py-2 border-b border-gray-200 dark:border-gray-700">
+        <div>
+            <h3 class="font-medium text-gray-900 dark:text-gray-100">{{ session.type }}</h3>
+            <p class="text-sm text-gray-500 dark:text-gray-400">
+                {{ session.date }} • {{ session.duration }} mins
+            </p>
+        </div>
+        <button class="text-red-500 hover:text-red-700"
+                hx-post="/sessions/remove-from-cart"
+                hx-vals='{"session_id": "{{ session.id }}"}'
+                hx-target="#selected-sessions"
+                hx-swap="innerHTML">
+            &times;
+        </button>
+    </li>
+    {% endfor %}
+</ul>
+{% else %}
+<p class="text-gray-500 dark:text-gray-400">No sessions selected yet.</p>
+{% endif %}

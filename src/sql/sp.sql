@@ -670,3 +670,86 @@ begin
 
 end;
 go
+
+
+-- Delete booking
+create procedure municipal.deleteBooking
+    @booking_id int
+as
+begin
+    set nocount on;
+    begin try
+        begin Transaction;
+
+        -- 1. Get the booking details
+        declare @user_id int, @session_id int, @session_type varchar(30), @refund_amount decimal(10, 2);
+
+        select
+            @user_id = b.user_id,
+            @session_id = h.session_id
+        from municipal.booking b
+        join municipal.has h on b.booking_id = h.booking_id
+        where b.booking_id = @booking_id;
+
+        -- Exit if the booking wasn't found
+        if @user_id is null or @session_id is null
+        begin
+            commit transaction;
+            return 1; -- Booking not found
+        end;
+
+        -- 2. Get session type for refund calculation
+        select @session_type = sType
+        from municipal.sessionn
+        where session_id = @session_id;
+
+        -- 3. Calculate refund amount
+        set @refund_amount =
+            case @session_type
+                when 'free' then 1.00
+                when 'aerobics' then 5.00
+                when 'class' then 3.00
+                else 0.00
+            end;
+        
+        -- 4. Refund user (add positive payment)
+        if @refund_amount > 0
+        begin
+            insert into municipal.payment (cost, user_id)
+            values (@refund_amount, @user_id)
+
+            --print 'Refunded ' + cast(@refund_amount as varchar) + '€ to user ' + cast(@user_id as varchar);
+        end;
+
+        -- 5. Backup and delete from junction table "has"
+        insert into municipal.deletes_has (booking_id, session_id, deleted_at)
+        select booking_id, session_id, current_timestamp
+        from municipal.has
+        where booking_id = @booking_id;
+
+        delete from municipal.has where booking_id = @booking_id;
+
+        -- 6. Backup and delete booking
+        insert into municipal.deletes_booking (booking_id, status, booking_date, user_id, deleted_at)
+        select booking_id, status, booking_date, user_id, current_timestamp
+        from municipal.booking
+        where booking_id = @booking_id;
+
+        delete from municipal.booking where booking_id = @booking_id;
+
+        -- print 'Booking ' + cast(@booking_id as varchar) + ' successfully deleted';
+
+        commit transaction;
+        return 0; -- Success
+    end try
+    begin catch
+        if @@trancount > 0
+            rollback transaction;
+
+        declare @errorMessage nvarchar(4000) = error_message();
+        declare @errorSeverity int = error_severity()
+        declare @error_state int = error_state()
+        raiserror(@errorMessage, @errorSeverity, @errorState);
+    end catch;
+end;
+go

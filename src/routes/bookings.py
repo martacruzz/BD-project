@@ -1,5 +1,5 @@
 from flask import Blueprint, abort, render_template, g
-from persistence.booking import get_booking_details
+from persistence.booking import get_booking_details, delete_booking
 from persistence import user
 
 bp = Blueprint('bookings', __name__, url_prefix='/bookings')
@@ -18,3 +18,11 @@ def booking_details(booking_id):
     if not booking:
       abort(404, description="Booking not found")
     return render_template("booking/booking_details.html", booking=booking)
+
+# Route for delete
+@bp.route("/<int:booking_id>/delete", methods=["POST"])
+def delete_booking_route(booking_id):
+  success = delete_booking(booking_id)
+  if not success:
+     abort(404, description="Booking not found or could not be deleted")
+  return # TODO Ver o que raio é suposto returnar

@@ -127,12 +127,26 @@
     <!-- Booking summary -->
     <div class="bg-white dark:bg-gray-800 rounded-xl shadow p-4">
       <h2 class="text-xl font-bold text-gray-900 dark:text-white mb-4">Selected Sessions</h2>
+      
+      <!--
       <ul id="selected-sessions" class="space-y-2 text-sm text-gray-700 dark:text-gray-300">
+      -->
+      <div id="booking-cart" hx-get="/booking/cart" hx-trigger="load, cartChanged from:body" hx-swap="innerHTML">
+      
         <!-- Dynamic list -->
-        <li>No sessions selected yet.</li>
-      </ul>
-      <button class="mt-4 w-full bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">Confirm
-        Booking</button>
+        <p>No sessions selected yet.</p>
+      <!-- </ul> -->
+      </div>
+
+      <button id="confirm-booking" 
+            class="mt-4 w-full bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
+            hx-post="/bookings/create-multiple"
+            hx-include="#booking-cart"
+            hx-target="#booking-cart"
+            hx-swap="innerHTML"
+            disabled>
+        Confirm Booking
+      </button>
     </div>
   </div>
 </div>
@@ -201,6 +215,43 @@
     }
   });
 
+
+  // Initialize HTMX progress indicators
+  document.body.addEventListener('htmx:beforeRequest', function(e) {
+    if (e.detail.elt.id === 'confirm-booking') {
+      const btn = document.getElementById('confirm-booking');
+      btn.disabled = true;
+      btn.innerHTML = `
+        <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white inline" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+        </svg>
+        Processing Bookings...
+      `;
+    }
+  });
+
+  // Handle booking completion
+  document.body.addEventListener('htmx:afterRequest', function(e) {
+    if (e.detail.elt.id === 'confirm-booking') {
+      // Refresh session list to update availability
+      htmx.ajax('GET', '/sessions', {
+        target: '#session-list',
+        swap: 'innerHTML'
+      });
+      
+      // Also refresh the cart
+      htmx.ajax('GET', '/booking/cart', {
+        target: '#selected-sessions',
+        swap: 'innerHTML'
+      });
+    }
+  });
+
+  // Trigger cart refresh after adding/removing items
+  document.body.addEventListener('cartChanged', function() {
+    htmx.trigger('#selected-sessions', 'cartChanged');
+  });
 
 </script>
 
