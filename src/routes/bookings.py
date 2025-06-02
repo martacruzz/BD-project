@@ -1,6 +1,6 @@
-from flask import Blueprint, abort, render_template, g
+from flask import Blueprint, abort, render_template, g, redirect, url_for
 from persistence.booking import get_booking_details, delete_booking
-from persistence import user
+from persistence import user, sessionn, session
 
 bp = Blueprint('bookings', __name__, url_prefix='/bookings')
 
@@ -25,4 +25,4 @@ def delete_booking_route(booking_id):
   success = delete_booking(booking_id)
   if not success:
      abort(404, description="Booking not found or could not be deleted")
-  return # TODO Ver o que raio é suposto returnar
+  return redirect(url_for('bookings.home'))

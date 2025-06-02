@@ -1,0 +1,18 @@
+{% if sessions %}
+<div class="bg-white dark:bg-gray-800 rounded-xl shadow p-4">
+  <h2 class="text-xl font-bold text-gray-900 dark:text-white mb-4">Selected Sessions</h2>
+
+
+  <div id="booking-cart" hx-get="/booking/cart" hx-trigger="load, cartChanged from:body" hx-swap="innerHTML">
+    <!-- Dynamic list -->
+    <p>No sessions selected yet.</p>
+  </div>
+
+  <button id="confirm-booking"
+    class="mt-4 w-full bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
+    hx-post="/sessions/confirm" hx-include="#booking-cart" hx-target="#booking-cart" hx-swap="innerHTML"
+    hx-trigger="click">
+    Confirm Booking
+  </button>
+</div>
+{% endif %}

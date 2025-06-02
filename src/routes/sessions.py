@@ -1,17 +1,16 @@
-from flask import Blueprint, abort, render_template, request, session
-from persistence.sessionn import list_all, read
-from persistence.booking import create_booking
+from flask import Blueprint, abort, render_template, request, session, g
+from persistence import booking, sessionn
 
 bp = Blueprint('sessions', __name__, url_prefix='/sessions')
 
 @bp.route('/')
 def home():
-  sessions = list_all()
+  sessions = sessionn.list_all()
   return render_template('session/session.html', sessions=sessions)
 
 @bp.route("/<int:session_id>/details")
 def session_details(session_id):
-    session = read(session_id)
+    session = sessionn.read(session_id)
     if not session:
       abort(404, description="Booking not found")
     return render_template("session/session_details.html", session=session)
@@ -25,7 +24,7 @@ def create_booking_route():
   except (KeyError, ValueError):
      abort(400, description="Missing or invalid user_id/session_id")
 
-  success = create_booking(user_id, session_id)
+  success = booking.create_booking(user_id, session_id)
   if not success:
      # The SP failed
      abort(400, description="Unable to create booking")
@@ -33,86 +32,48 @@ def create_booking_route():
   return "success", 200
 
 
-# Route to add booking to cart
-@bp.route("/add-to-cart", methods=["POST"])
-def add_to_cart():
-  session_id = request.form.get('session_id')
-  if not session_id:
-    return "", 400
-   
-  # Initialize cart in session if not exists
-  if 'booking_cart' not in session:
-    session['booking_cart'] = []
+# add to cart
+@bp.route('/add/<int:session_id>', methods=['POST'])
+def add_to_cart(session_id):
+    if 'cart' not in session:
+        session['cart'] = []
 
-  # Add session to cart (prevents duplicates)
-  if session_id not in session['booking_cart']:
-    session['booking_cart'].append(session_id)
-    session.modified = True
-    
+    if session_id not in session['cart']:
+        session['cart'].append(session_id)
+        session.modified = True  # update the session
 
-  return "", 200
-  
+    cart_sessions = [sessionn.read(sid) for sid in session['cart']]
+    return render_template('session/booking_cart_items.html', sessions=cart_sessions)
 
-# Route to render cart contents
-@bp.route("/booking/cart")
-def booking_cart():
-    cart = session.get('booking_cart', [])
-    sessions_in_cart = []
 
-    if cart:
-        # Fetch session details from database
-        all_sessions = list_all()
-        for sess in all_sessions:
-            if str(sess.session_id) in cart:  # Convert to string for comparison
-                sessions_in_cart.append({
-                    'id': sess.session_id,
-                    'type': sess.sType,
-                    'date': sess.date_time.strftime('%Y-%m-%d %H:%M'),
-                    'duration': sess.duration  # Add duration since it's in the template
-                })
-    return render_template('partials/booking_cart.html', sessions=sessions_in_cart)  
-
-# Remove from cart
-@bp.route("/sessions/remove-from-cart", methods=["POST"])
-def remove_from_cart():
-    session_id = request.form.get('session_id')
-    if not session_id or 'booking_cart' not in session:
+# remvoe from cart
+@bp.route("/remove/<int:session_id>", methods=["POST"])
+def remove_from_cart(session_id):
+    if 'cart' not in session:
         return "", 400
-    
-    # Convert to string for consistent comparison
-    session_id = str(session_id)
-    
-    if session_id in session['booking_cart']:
-        session['booking_cart'].remove(session_id)
+
+    if session_id in session['cart']:
+        session['cart'].remove(session_id)
         session.modified = True
-    
-    return booking_cart()  # Return updated cart HTML
 
-# Endpoint for multiple booking creation
-@bp.route("/bookings/create-multiple", methods=["POST"])
+    cart_sessions = [sessionn.read(sid) for sid in session['cart']]
+    return render_template('session/booking_cart_items.html', sessions=cart_sessions)
+
+
+@bp.route("/confirm", methods=["POST"])
 def create_multiple_bookings():
-  if 'user_id' not in session or 'booking_cart' not in session:
-    return "Authentication required", 401
-  
-  user_id = session['user_id']
-  cart = session.get('booking_cart', [])
-  results = []
+    if 'cart' not in session or not session['cart']:
+        return "No sessions to book.", 400
 
-  for session_id in cart:
-    success = create_booking(user_id, int(session_id))
-    results.append({
-      'session_id': session_id,
-      'success': success
-    })
+    user_id = g.user.user_id  # user currently logged in
+    success_count = 0
 
-  # Clear cart after processing
-  session['booking_cart'] = []
-  session.modified = True
+    for session_id in session['cart']:
+        if booking.create_booking(user_id, session_id):
+            success_count += 1
 
-  # Return results summary
-  success_count = sum(1 for r in results if r['success'])
-  return render_template('partials/booking_result.html',
-                         results=results,
-                         success_count = success_count,
-                         total_count=len(results))
+    session['cart'] = []
+    session.modified = True
 
+    return render_template("session/booking_cart_items.html", sessions=[],
+                           message=f"{success_count} booking(s) confirmed.")
