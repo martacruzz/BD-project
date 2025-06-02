@@ -10,7 +10,7 @@
     <p class="text-lg font-semibold text-gray-800 dark:text-gray-100">Booking ID: {{ booking.booking_id }}</p>
     <p class="text-sm text-gray-500 dark:text-gray-400">
       Session: {{ booking.session_type }}<br>
-      Date & Time: {{ booking.date_time.strftime('%Y-%m-%d %H:%M') }}
+      Date & Time: {{ booking.booking_date.strftime('%Y-%m-%d %H:%M') }}
     </p>
   </div>
   <div class="mt-4 sm:mt-0 flex gap-2">

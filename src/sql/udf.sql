@@ -60,7 +60,7 @@ create function municipal.UserBookings (
     @user_id int
 )
 returns table
-with shemabinding
+with schemabinding
 as
 return
 (

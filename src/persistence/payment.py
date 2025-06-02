@@ -7,9 +7,9 @@ class PaymentDescriptor(NamedTuple):
   payment_id: int
   cost: float
   date: str
-  booking_id: int
-  session_type: str
-  session_date: str
+  # booking_id: int
+  # session_type: str
+  # session_date: str
 
 # Create a payment (there is a trigger to make sure the balance isn't negative)
 def add_payment(user_id: int, cost: float) -> int:
@@ -41,8 +41,9 @@ def list_user_payments(user_id: int) -> list[PaymentDescriptor]:
       cursor = conn.cursor()
 
       cursor.execute("""
-        select payment_id, cost, pay_time,
-        from municipal.PaymentHistory(?)
+        select payment_id, cost, pay_time
+        from municipal.payment as p
+        where p.user_id = ?
         order by pay_time desc;
       """, user_id)
 
@@ -57,8 +58,8 @@ def total_paid_by_user(user_id: int) -> float:
       cursor = conn.cursor()
       cursor.execute("""
           SELECT SUM(cost)
-          FROM municipal.PaymentHistory(?)
-          WHERE cost < 0;
+          FROM municipal.payment as p
+          WHERE p.cost < 0 and p.user_id = ?;
       """, user_id)
 
       row = cursor.fetchone()

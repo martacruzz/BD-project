@@ -66,7 +66,7 @@
       <!-- Load Card Form -->
       <div class="bg-white dark:bg-gray-800 rounded-xl shadow p-6">
         <h2 class="text-xl font-bold text-gray-900 dark:text-white mb-4">Load Card</h2>
-        <form action="/payments/add" method="post" class="space-y-4">
+        <form action="/balance/{{ user.user_id }}/add" method="post" class="space-y-4">
           <div>
             <label for="amount" class="block text-sm font-medium text-gray-700 dark:text-gray-200">Amount (€)</label>
             <input type="number" name="amount" id="amount" step="0.01" min="1"
