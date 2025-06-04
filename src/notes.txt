@@ -6,5 +6,9 @@ export SQL_PASSWORD="Loirinhos@2005"
 
 when opening a new terminal.
 to run interface do:
-Pedro: poetry run flask run
-Marta: flask run
+Pedro:
+poetry run flask run
+
+
+Marta:
+flask run
