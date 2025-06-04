@@ -30,6 +30,4 @@ def search_bookings():
     if query:
       bookings = [ b for b in bookings if query in b.instructor_name.lower() or query in b.sType.lower()]
 
-    print(bookings)
-
     return render_template("booking/booking_list.html", bookings=bookings)
