@@ -84,14 +84,12 @@ def delete_booking(booking_id: int) -> bool:
     cursor = conn.cursor()
 
     try:
-      # Call SP and capture return value
       cursor.execute("""
         declare @rc int;
         exec @rc = municipal.deleteBooking @booking_id = ?;
         select @rc;
       """, (booking_id))
 
-      # Fetch the return code
       row = cursor.fetchone()
       if not row:
         return False

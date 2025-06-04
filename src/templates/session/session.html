@@ -60,7 +60,7 @@
     <!-- Filter Form (initially hidden) -->
     <div id="filter-form-container" class="mt-4 hidden bg-white dark:bg-gray-800 rounded-xl shadow p-6">
       <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Filter Sessions</h2>
-      <form id="filter-form" hx-post="/sessions/filter" hx-target="#session-list" hx-swap="outerHTML"
+      <form id="filter-form" hx-post="/sessions/filter" hx-target="#session-list" hx-swap="innerHTML"
         hx-indicator="#spinner" class="space-y-6">
         <!-- Row 1: Date and Session Type -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -74,9 +74,9 @@
             <select id="type" name="type"
               class="mt-1 block w-full border-gray-300 dark:border-gray-700 rounded-md shadow-sm dark:bg-gray-700 dark:text-white">
               <option value="">All</option>
-              <option value="aerobics">Aqua Aerobics</option>
-              <option value="lesson">Swimming Lesson</option>
-              <option value="free">Free Swim</option>
+              <option value="Aerobics">Aerobics</option>
+              <option value="Class">Class</option>
+              <option value="Free">Free</option>
             </select>
           </div>
         </div>
@@ -193,8 +193,8 @@
     }
   });
 
+  // reset filters button
   document.addEventListener('DOMContentLoaded', function () {
-    // Add event listener to reset filters
     const resetButton = document.createElement('button');
     resetButton.type = 'button';
     resetButton.className = 'ml-4 bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold py-2 px-4 rounded-md shadow-sm';
@@ -203,12 +203,9 @@
     resetButton.addEventListener('click', function () {
       document.getElementById('filter-form').reset();
       dateInput.valueAsDate = new Date();
-
-      // Trigger filter with empty values
       htmx.trigger('#filter-form', 'submit');
     });
 
-    // Add reset button next to submit button
     const submitContainer = document.querySelector('#filter-form .flex.justify-end');
     if (submitContainer) {
       submitContainer.appendChild(resetButton);

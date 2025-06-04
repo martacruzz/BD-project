@@ -15,21 +15,20 @@ def session_details(session_id):
       abort(404, description="Booking not found")
     return render_template("session/session_details.html", session=session)
 
-# Route for confirming bookings
+
 @bp.route("/create", methods=["POST"])
 def create_booking_route():
-  try:
-     user_id = int(request.form['user_id'])
-     session_id = int(request.form['session_id'])
-  except (KeyError, ValueError):
-     abort(400, description="Missing or invalid user_id/session_id")
+    try:
+        user_id = int(request.form['user_id'])
+        session_id = int(request.form['session_id'])
+    except (KeyError, ValueError):
+        abort(400, description="Missing or invalid user_id/session_id")
 
-  success = booking.create_booking(user_id, session_id)
-  if not success:
-     # The SP failed
-     abort(400, description="Unable to create booking")
+    success = booking.create_booking(user_id, session_id)
+    if not success:
+        abort(400, description="Unable to create booking")
 
-  return "success", 200
+    return "success", 200
 
 
 # add to cart

@@ -74,14 +74,13 @@ def read(user_id: int):
             row.address or ""
         )
 
-# Uses Stored Procedure to create a user
+
 def create(user: UserDetails):
 
     try:
         with create_connection() as conn:
             cursor = conn.cursor()
 
-            # Create new user with stored procedure
             sql = """
             declare @new_person_id int, @new_user_id int;
 
@@ -117,18 +116,14 @@ def create(user: UserDetails):
                 user.password_hash
             )
 
-            # Fetch the result of selected
             row = cursor.fetchone()
             if row is None:
-                # Shouldn't be happening
                 raise RuntimeError("Stored Procedure didn't return new IDs")
             
             new_person_id, new_user_id = row.new_person_id, row.new_user_id
 
-            # Commit transaction
             conn.commit()
 
-            # Return the output (optional, since you kinda don't need it)
             return new_person_id, new_user_id
         
     except pyodbc.DatabaseError as ex:
@@ -148,7 +143,6 @@ def delete(user_id: int):
         cursor = conn.cursor()
         try:
             
-            # Execute the stored procedure
             cursor.execute(
                 "Exec municipal.deleteUser @user_id = ?;",
                 user_id
@@ -179,8 +173,7 @@ def authenticate(username: str, password: str) -> UserDescriptor | None:
             return UserDescriptor(row.user_id, row.username, row.cc, row.name)
         return None
     
-# Uses a procedure to get the user's bookings (only those in the future)
-# This is not a history
+
 def get_user_bookings(user_id: int):
     """Get all bookings under the name of a given user"""
     with create_connection() as conn:
@@ -196,9 +189,6 @@ def get_user_bookings(user_id: int):
             join municipal.instructor i on s.instructor_id = i.instructor_id
             join municipal.person p on i.person_id = p.person_id
             where b.user_id = ?
-            
+            and s.date_time > GETDATE()
         """, user_id)
         return cursor.fetchall()
-    
-
-    # and s.date_time > GETDATE()

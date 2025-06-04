@@ -42,6 +42,7 @@ def list_all() -> list[SessionDescriptor]:
       JOIN municipal.person p ON i.person_id = p.person_id
       JOIN municipal.pool pl ON s.pool_id = pl.pool_id
       JOIN municipal.lane l ON s.pool_id = l.pool_id AND s.lane_number = l.lane_number
+      WHERE s.date_time > GETDATE()
       ORDER BY s.date_time;
     """)
 

@@ -11,13 +11,14 @@ def booking_details(booking_id):
       abort(404, description="Booking not found")
     return render_template("booking/booking_details.html", booking=booking)
 
-# Route for delete
+
 @bp.route("/delete/<int:booking_id>", methods=["DELETE"])
 def delete_booking_route(booking_id):
-  success = delete_booking(booking_id)
-  if not success:
-     abort(404, description="Booking not found or could not be deleted")
-  return redirect(url_for('home'))
+    success = delete_booking(booking_id)
+    bookings = user.get_user_bookings(g.user.user_id)
+    if not success:
+      abort(404, description="Booking not found or could not be deleted")
+    return render_template("booking/booking_list.html", bookings=bookings)
 
 # route for searching bookings
 @bp.route('/search')
