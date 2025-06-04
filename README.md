@@ -1,8 +1,6 @@
-# Aula 7 - Contacts App Python
+# SwiM - A municipal pool management app
 
 Simple Flask webapp project backed by SQL Server.
-
-Distributed for learning purposes.
 
 ## Dependencies
 
@@ -24,15 +22,10 @@ If you use poetry shell, then run `python app.py` to execute the app.
 
 ## Running
 
+Make sure you define these 2 environment variables: 
+- export FLASK_APP = app.py
+- export SQL_PASSWORD="[your server's password]"  
+
 If not on a virtual environemnt open one with: `poetry shell`
 
 To run the application, use the following command: `flask run --debug`
-
-## Recommended resources
-
-
-
-
-
-
-
