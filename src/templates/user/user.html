@@ -50,14 +50,14 @@
     <h1 class="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-6">Your Bookings</h1>
 
     <!-- Search bar -->
-    <div class="flex items-center mt-6 space-x-2">
-      <form class="flex flex-1" method="get" hx-get="/search-persons" hx-trigger="input" hx-target=".persons-list">
-        <input class="flex-1 p-2 border rounded dark:bg-gray-800 dark:border-gray-600" type="search"
-          placeholder="Search by Name" name="query" autocomplete="off">
-      </form>
-    </div>
+    <form class="flex flex-1" method="get" hx-get="/bookings/search" hx-trigger="input changed delay:300ms"
+      hx-target="#booking-list">
+      <input class="flex-1 p-2 border rounded dark:bg-gray-800 dark:border-gray-600" type="search"
+        placeholder="Search bookings..." name="query" autocomplete="off">
+    </form>
 
-    <div>
+
+    <div id="booking-list">
       {% include "booking/booking_list.html" %}
     </div>
 

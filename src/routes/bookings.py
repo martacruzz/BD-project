@@ -1,4 +1,4 @@
-from flask import Blueprint, abort, render_template, g, redirect, url_for
+from flask import Blueprint, abort, render_template, g, redirect, url_for, request
 from persistence.booking import get_booking_details, delete_booking
 from persistence import user, sessionn, session
 
@@ -10,6 +10,7 @@ def home():
       return "Unauthorized", 401 
 
     bookings = user.get_user_bookings(g.user.user_id)
+    print(bookings)
     return render_template("user/user.html", bookings=bookings, user=g.user)
 
 @bp.route("/<int:booking_id>/details")
@@ -26,3 +27,16 @@ def delete_booking_route(booking_id):
   if not success:
      abort(404, description="Booking not found or could not be deleted")
   return redirect(url_for('bookings.home'))
+
+# route for searching bookings
+@bp.route('/bookings/search')
+def search_bookings():
+    query = request.args.get('query', '').strip().lower()
+    user_id = g.user.user_id
+
+    bookings = user.get_user_bookings(user_id)
+
+    if query:
+        bookings = [ b for b in bookings if query in b.instructor_name.lower() or query in b.sType.lower()]
+
+    return render_template("booking/booking_list.html", bookings=bookings)

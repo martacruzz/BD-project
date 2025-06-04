@@ -46,7 +46,7 @@ def add_to_cart(session_id):
     return render_template('session/booking_cart_items.html', sessions=cart_sessions)
 
 
-# remvoe from cart
+# remvove from cart
 @bp.route("/remove/<int:session_id>", methods=["POST"])
 def remove_from_cart(session_id):
     if 'cart' not in session:

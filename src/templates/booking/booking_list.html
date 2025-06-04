@@ -7,10 +7,11 @@
 <div
   class="bg-white dark:bg-gray-800 rounded-2xl shadow-md p-6 mb-4 flex flex-col sm:flex-row justify-between items-start sm:items-center hover:shadow-lg transition">
   <div>
-    <p class="text-lg font-semibold text-gray-800 dark:text-gray-100">Booking ID: {{ booking.booking_id }}</p>
+    <p class="text-lg font-semibold text-gray-800 dark:text-gray-100">{{ booking.session_type }} with
+      {{booking.instructor_name }}</p>
     <p class="text-sm text-gray-500 dark:text-gray-400">
       Session: {{ booking.session_type }}<br>
-      Date & Time: {{ booking.booking_date.strftime('%Y-%m-%d %H:%M') }}
+      Date: {{ booking.booking_date.strftime('%Y-%m-%d %H:%M') }}
     </p>
   </div>
   <div class="mt-4 sm:mt-0 flex gap-2">
