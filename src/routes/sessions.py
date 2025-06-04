@@ -117,3 +117,43 @@ def create_multiple_bookings():
         sessions=[],
         message=full_message
     )
+
+@bp.route("/filter", methods=["POST"])
+def filter_route():
+    """
+    Accepts form data from the filter form (date, type, instructor, min_duration, max_duration),
+    calls persistence.sessionn.filter_sessions(), and returns the updated session list HTML.
+    """
+    # Read filter parameters from the form (they may be empty strings)
+    sType = request.form.get("type") or None
+    instructor_name = request.form.get("instructor") or None
+
+    # Parse durations into ints if provided, else None
+    try:
+        duration_min = int(request.form["min_duration"]) if request.form.get("min_duration") else None
+    except ValueError:
+        return "Invalid minimum duration", 400
+
+    try:
+        duration_max = int(request.form["max_duration"]) if request.form.get("max_duration") else None
+    except ValueError:
+        return "Invalid maximum duration", 400
+
+    # Parse date (YYYY-MM-DD) or None
+    search_date = request.form.get("date") or None
+
+    # Call your filtering function
+    try:
+        filtered = session.filter_sessions(
+            sType=sType,
+            instructor_name=instructor_name,
+            duration_min=duration_min,
+            duration_max=duration_max,
+            search_date=search_date
+        )
+    except Exception as e:
+        # If something goes wrong in SQL or Python, return 500
+        return f"Filter error: {str(e)}", 500
+
+    # Render the session cards partial (session_list.html) with the filtered sessions
+    return render_template("session/session_list.html", sessions=filtered)

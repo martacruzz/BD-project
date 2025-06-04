@@ -524,14 +524,14 @@ begin
         -- 5. Check if the user ain't broke (if balance is enough)
         declare @session_price decimal(10, 2);
 
-        if @sType = 'free'
+        if @sType = 'Free'
             set @session_price = 1 -- 1€ entrance fee
 
-        else if @sType = 'aerobics'
-            set @session_price = 5 -- 5€ aerobics
+        else if @sType = 'Aerobics'
+            set @session_price = 5 -- 5€ Aerobics
 
-        else if @sType = 'class'
-            set @session_price = 3 -- 3€ class
+        else if @sType = 'Class'
+            set @session_price = 3 -- 3€ Class
 
         else
         begin
@@ -706,9 +706,9 @@ begin
         -- 3. Calculate refund amount
         set @refund_amount =
             case @session_type
-                when 'free' then 1.00
-                when 'aerobics' then 5.00
-                when 'class' then 3.00
+                when 'Free' then 1.00
+                when 'Aerobics' then 5.00
+                when 'Class' then 3.00
                 else 0.00
             end;
         

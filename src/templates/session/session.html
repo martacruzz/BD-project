@@ -45,75 +45,79 @@
 <div class="container mx-auto px-4 py-6">
   <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-6">Book a Session</h1>
 
-  <!-- Filter and search -->
-  <div class="mb-6">
-    <!-- Toggle Button -->
-    <button id="toggle-filters"
-      class="flex items-center justify-between w-full md:w-auto bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-white font-medium px-4 py-2 rounded-md shadow hover:bg-gray-200 dark:hover:bg-gray-600 transition">
-      <span>Filters</span>
-      <svg id="toggle-icon" class="w-5 h-5 ml-2 transform transition-transform" fill="none" stroke="currentColor"
-        viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-      </svg>
-    </button>
+<!-- Filter and search -->
+<div class="mb-6">
+  <!-- Toggle Button -->
+  <button id="toggle-filters"
+    class="flex items-center justify-between w-full md:w-auto bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-white font-medium px-4 py-2 rounded-md shadow hover:bg-gray-200 dark:hover:bg-gray-600 transition">
+    <span>Filters</span>
+    <svg id="toggle-icon" class="w-5 h-5 ml-2 transform transition-transform" fill="none" stroke="currentColor"
+      viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+    </svg>
+  </button>
 
-    <!-- Filter Form (initially hidden) -->
-    <div id="filter-form-container" class="mt-4 hidden bg-white dark:bg-gray-800 rounded-xl shadow p-6">
-      <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Filter Sessions</h2>
-      <form id="filter-form" class="space-y-6">
-        <!-- Row 1: Date and Session Type -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <label for="date" class="block text-sm font-medium text-gray-700 dark:text-gray-200">Date</label>
-            <input type="date" id="date" name="date"
-              class="mt-1 block w-full border-gray-300 dark:border-gray-700 rounded-md shadow-sm dark:bg-gray-700 dark:text-white" />
-          </div>
-          <div>
-            <label for="type" class="block text-sm font-medium text-gray-700 dark:text-gray-200">Session Type</label>
-            <select id="type" name="type"
-              class="mt-1 block w-full border-gray-300 dark:border-gray-700 rounded-md shadow-sm dark:bg-gray-700 dark:text-white">
-              <option value="">All</option>
-              <option value="aerobics">Aqua Aerobics</option>
-              <option value="lesson">Swimming Lesson</option>
-              <option value="free">Free Swim</option>
-            </select>
-          </div>
-        </div>
-
-        <!-- Row 2: Instructor -->
+  <!-- Filter Form (initially hidden) -->
+  <div id="filter-form-container" class="mt-4 hidden bg-white dark:bg-gray-800 rounded-xl shadow p-6">
+    <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Filter Sessions</h2>
+    <form id="filter-form" 
+          hx-post="/sessions/filter" 
+          hx-target="#session-list" 
+          hx-swap="outerHTML"
+          hx-indicator="#spinner"
+          class="space-y-6">
+      <!-- Row 1: Date and Session Type -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
-          <label for="instructor" class="block text-sm font-medium text-gray-700 dark:text-gray-200">Instructor</label>
-          <input type="text" id="instructor" name="instructor" placeholder="Instructor name"
+          <label for="date" class="block text-sm font-medium text-gray-700 dark:text-gray-200">Date</label>
+          <input type="date" id="date" name="date"
             class="mt-1 block w-full border-gray-300 dark:border-gray-700 rounded-md shadow-sm dark:bg-gray-700 dark:text-white" />
         </div>
-
-        <!-- Row 3: Duration Range -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <label for="min_duration" class="block text-sm font-medium text-gray-700 dark:text-gray-200">Min Duration
-              (minutes)</label>
-            <input type="number" id="min_duration" name="min_duration" min="0" placeholder="e.g., 30"
-              class="mt-1 block w-full border-gray-300 dark:border-gray-700 rounded-md shadow-sm dark:bg-gray-700 dark:text-white" />
-          </div>
-          <div>
-            <label for="max_duration" class="block text-sm font-medium text-gray-700 dark:text-gray-200">Max Duration
-              (minutes)</label>
-            <input type="number" id="max_duration" name="max_duration" min="0" placeholder="e.g., 90"
-              class="mt-1 block w-full border-gray-300 dark:border-gray-700 rounded-md shadow-sm dark:bg-gray-700 dark:text-white" />
-          </div>
+        <div>
+          <label for="type" class="block text-sm font-medium text-gray-700 dark:text-gray-200">Session Type</label>
+          <select id="type" name="type"
+            class="mt-1 block w-full border-gray-300 dark:border-gray-700 rounded-md shadow-sm dark:bg-gray-700 dark:text-white">
+            <option value="">All</option>
+            <option value="aerobics">Aqua Aerobics</option>
+            <option value="lesson">Swimming Lesson</option>
+            <option value="free">Free Swim</option>
+          </select>
         </div>
+      </div>
 
-        <!-- Submit -->
-        <div class="flex justify-end">
-          <button type="submit"
-            class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-6 rounded-md shadow-sm">
-            Apply Filters
-          </button>
+      <!-- Row 2: Instructor -->
+      <div>
+        <label for="instructor" class="block text-sm font-medium text-gray-700 dark:text-gray-200">Instructor</label>
+        <input type="text" id="instructor" name="instructor" placeholder="Instructor name"
+          class="mt-1 block w-full border-gray-300 dark:border-gray-700 rounded-md shadow-sm dark:bg-gray-700 dark:text-white" />
+      </div>
+
+      <!-- Row 3: Duration Range -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label for="min_duration" class="block text-sm font-medium text-gray-700 dark:text-gray-200">Min Duration
+            (minutes)</label>
+          <input type="number" id="min_duration" name="min_duration" min="0" placeholder="e.g., 30"
+            class="mt-1 block w-full border-gray-300 dark:border-gray-700 rounded-md shadow-sm dark:bg-gray-700 dark:text-white" />
         </div>
-      </form>
-    </div>
+        <div>
+          <label for="max_duration" class="block text-sm font-medium text-gray-700 dark:text-gray-200">Max Duration
+            (minutes)</label>
+          <input type="number" id="max_duration" name="max_duration" min="0" placeholder="e.g., 90"
+            class="mt-1 block w-full border-gray-300 dark:border-gray-700 rounded-md shadow-sm dark:bg-gray-700 dark:text-white" />
+        </div>
+      </div>
+
+      <!-- Submit -->
+      <div class="flex justify-end">
+        <button type="submit"
+          class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-6 rounded-md shadow-sm">
+          Apply Filters
+        </button>
+      </div>
+    </form>
   </div>
-
+</div>
 
 
 
@@ -190,6 +194,28 @@
   modal.addEventListener('click', (e) => {
     if (e.target === modal) {
       closeSessionModal();
+    }
+  });
+
+  document.addEventListener('DOMContentLoaded', function() {
+    // Add event listener to reset filters
+    const resetButton = document.createElement('button');
+    resetButton.type = 'button';
+    resetButton.className = 'ml-4 bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold py-2 px-4 rounded-md shadow-sm';
+    resetButton.textContent = 'Reset Filters';
+    
+    resetButton.addEventListener('click', function() {
+      document.getElementById('filter-form').reset();
+      dateInput.valueAsDate = new Date();
+      
+      // Trigger filter with empty values
+      htmx.trigger('#filter-form', 'submit');
+    });
+    
+    // Add reset button next to submit button
+    const submitContainer = document.querySelector('#filter-form .flex.justify-end');
+    if (submitContainer) {
+      submitContainer.appendChild(resetButton);
     }
   });
 
