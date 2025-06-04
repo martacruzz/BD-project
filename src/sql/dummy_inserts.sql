@@ -12,17 +12,7 @@ VALUES
 ('123123123', 'David Lee', 'david@example.com', 966778899, '2002-09-05', 21, '606 Elm Ct'),
 ('456456456', 'Emma Davis', 'emma@example.com', 977889900, '1993-04-25', 30, '707 Spruce Way'),
 ('789789789', 'James Miller', 'james@example.com', 988990011, '1988-07-12', 35, '808 Fir Rd'),
-('321321321', 'Olivia Taylor', 'olivia@example.com', 999001122, '1997-01-19', 26, '909 Redwood Pl'),
-('654987321', 'Carlos Silva', 'carlos@example.com', 911223344, '1988-04-12', 36, '1010 Ocean Dr'),
-('321654987', 'Elena Rodriguez', 'elena@example.com', 922334455, '1991-09-25', 32, '2020 Bay View'),
-('789456123', 'James Wilson', 'jamesw@example.com', 933445566, '1979-03-08', 45, '3030 Harbor St'),
-('159753486', 'Sophie Martin', 'sophie@example.com', 944556677, '1994-07-19', 29, '4040 Marina Blvd'),
-('486159753', 'Thomas Johnson', 'thomas@example.com', 955667788, '1983-11-30', 40, '5050 Coast Hwy'),
-('753159486', 'Liam Anderson', 'liam@example.com', 966778899, '1996-02-14', 28, '6060 Beach Rd'),
-('357159486', 'Emma Thompson', 'emmat@example.com', 977889900, '1999-05-27', 25, '7070 Shoreline Dr'),
-('258369147', 'Noah Garcia', 'noah@example.com', 988990011, '2001-08-03', 22, '8080 Tidal Way'),
-('147258369', 'Olivia Martinez', 'oliviam@example.com', 999001122, '1997-12-11', 26, '9090 Wave St'),
-('369147258', 'William Brown', 'william@example.com', 900112233, '1993-06-24', 31, '1010 Surf Ave');
+('321321321', 'Olivia Taylor', 'olivia@example.com', 999001122, '1997-01-19', 26, '909 Redwood Pl');
 
 -- Users (5 users)
 INSERT INTO municipal.app_user (person_id, balance, nif, username, password_hash)
@@ -38,12 +28,7 @@ INSERT INTO municipal.instructor (person_id, specialization)
 VALUES 
 (2, 'Hidroginástica'),
 (6, 'Natação Adultos'),
-(9, 'Aqua Zumba')
-(13, 'Competitive Swimming'),
-(14, 'Water Safety'),
-(15, 'Aqua Yoga'),
-(16, 'Diving Techniques'),
-(17, 'Children Swim Lessons');
+(9, 'Aqua Zumba');
 
 -- Lifeguards (4 lifeguards)
 INSERT INTO municipal.lifeguard (person_id)
@@ -51,12 +36,7 @@ VALUES
 (3),
 (7),
 (10),
-(12),
-(18),
-(19),
-(20),
-(21),
-(22);
+(12);
 
 -- Pools (3 pools)
 INSERT INTO municipal.pool (name, location, total_lanes, opening_time, closing_time)
@@ -117,30 +97,7 @@ VALUES
 (60, '2025-08-01 08:00:00', 'Free', 10, NULL, 1, 3),
 (60, '2025-08-01 18:00:00', 'Aerobics', 8, 1, 3, 3),
 (90, '2025-08-02 07:00:00', 'Class', 6, 2, 4, 3),
-(45, '2025-08-02 19:00:00', 'Class', 10, 3, 1, 3),
-
--- Morning sessions
-(60, '2025-08-03 07:00:00', 'Aerobics', 12, 4, 1, 1),
-(45, '2025-08-03 08:30:00', 'Class', 15, 5, 2, 2),
-(90, '2025-08-04 06:30:00', 'Free', 20, NULL, 1, 3),
-
--- Afternoon sessions
-(60, '2025-08-04 14:00:00', 'Class', 15, 6, 4, 1),
-(45, '2025-08-05 15:30:00', 'Aerobics', 10, 7, 3, 2),
-(60, '2025-08-06 13:00:00', 'Free', 15, NULL, 2, 3),
-
--- Evening sessions
-(90, '2025-08-05 18:00:00', 'Class', 12, 8, 7, 1),
-(60, '2025-08-06 19:30:00', 'Aerobics', 10, 9, 5, 2),
-(45, '2025-08-07 17:00:00', 'Free', 15, NULL, 4, 3),
-
--- Weekend sessions
-(120, '2025-08-10 09:00:00', 'Class', 20, 4, 1, 1),
-(90, '2025-08-10 11:00:00', 'Aerobics', 15, 5, 2, 2),
-(60, '2025-08-11 10:30:00', 'Free', 20, NULL, 3, 3),
-(90, '2025-08-11 14:00:00', 'Class', 15, 6, 4, 1),
-(120, '2025-08-12 15:30:00', 'Aerobics', 12, 7, 5, 2),
-(60, '2025-08-12 18:00:00', 'Free', 15, NULL, 1, 3);
+(45, '2025-08-02 19:00:00', 'Class', 10, 3, 1, 3);
 
 -- Bookings (20 bookings)
 INSERT INTO municipal.booking (status, booking_date, user_id)
