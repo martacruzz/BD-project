@@ -62,18 +62,58 @@ def remove_from_cart(session_id):
 
 @bp.route("/confirm", methods=["POST"])
 def create_multiple_bookings():
+    """
+    Tries to create a booking for each session in the user's cart.
+    Builds a summary message based on each SP return‐code, then clears the cart.
+    """
     if 'cart' not in session or not session['cart']:
         return "No sessions to book.", 400
 
-    user_id = g.user.user_id  # user currently logged in
+    user_id = g.user.user_id
+
     success_count = 0
+    errors = []
 
+    # Map SP return‐codes to human messages:
+    rc_to_msg = {
+        1: "Session not found.",
+        2: "Session full.",
+        3: "Duplicate booking.",
+        4: "Unexpected error occurred.",
+        5: "User not found.",
+        6: "Not enough money in your balance.",
+        7: "Unknown session type."
+    }
+
+    # Loop through each session_id in the cart and call the SP:
     for session_id in session['cart']:
-        if booking.create_booking(user_id, session_id):
+        rc = booking.create_booking(user_id, session_id)
+        if rc == 0:
             success_count += 1
+        else:
+            # Collect a failure message for this session:
+            msg = rc_to_msg.get(rc, "Unknown error.")
+            errors.append(f"Session {session_id}: {msg}")
 
+    # Clear the cart now that we attempted all bookings:
     session['cart'] = []
     session.modified = True
 
-    return render_template("session/booking_cart_items.html", sessions=[],
-                           message=f"{success_count} booking(s) confirmed.")
+    # Build a single “popup”‐style message:
+    if success_count and not errors:
+        # All succeeded
+        full_message = f"All {success_count} booking(s) confirmed successfully!"
+    elif success_count and errors:
+        # Some succeeded, some failed
+        errs = " ".join(errors)
+        full_message = f"{success_count} booking(s) succeeded. Failed: {errs}"
+    else:
+        # None succeeded
+        full_message = "No bookings succeeded. " + " ".join(errors)
+
+    # Pass that message into your template for a popup or banner:
+    return render_template(
+        "session/booking_cart_items.html",
+        sessions=[],
+        message=full_message
+    )

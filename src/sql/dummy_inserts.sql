@@ -84,20 +84,20 @@ VALUES
 INSERT INTO municipal.sessionn (duration, date_time, sType, max_capacity, instructor_id, lane_number, pool_id)
 VALUES 
 -- Pool 1 Sessions
-(60, '2025-06-01 10:00:00', 'Hidroginástica', 10, 1, 1, 1),
-(45, '2025-06-01 14:00:00', 'Natação Livre', 15, NULL, 2, 1),
-(60, '2025-06-02 09:00:00', 'Aqua Zumba', 12, 3, 4, 1),
-(90, '2025-06-02 16:00:00', 'Natação Competição', 8, 2, 5, 1),
+(60, '2025-06-01 10:00:00', 'free', 10, 1, 1, 1),
+(45, '2025-06-01 14:00:00', 'class', 15, NULL, 2, 1),
+(60, '2025-06-02 09:00:00', 'class', 12, 3, 4, 1),
+(90, '2025-06-02 16:00:00', 'aerobics', 8, 2, 5, 1),
 
 -- Pool 2 Sessions
-(60, '2025-06-01 11:30:00', 'Hidroginástica', 10, 1, 1, 2),
-(45, '2025-06-02 15:00:00', 'Aqua Zumba', 12, 3, 2, 2),
+(60, '2025-06-01 11:30:00', 'aerobics', 10, 1, 1, 2),
+(45, '2025-06-02 15:00:00', 'class', 12, 3, 2, 2),
 
 -- Pool 3 Sessions
-(60, '2025-06-01 08:00:00', 'Natação Livre', 10, NULL, 1, 3),
-(60, '2025-06-01 18:00:00', 'Hidroginástica', 8, 1, 3, 3),
-(90, '2025-06-02 07:00:00', 'Natação Competição', 6, 2, 4, 3),
-(45, '2025-06-02 19:00:00', 'Aqua Zumba', 10, 3, 1, 3);
+(60, '2025-06-01 08:00:00', 'free', 10, NULL, 1, 3),
+(60, '2025-06-01 18:00:00', 'aerobics', 8, 1, 3, 3),
+(90, '2025-06-02 07:00:00', 'class', 6, 2, 4, 3),
+(45, '2025-06-02 19:00:00', 'class', 10, 3, 1, 3);
 
 -- Bookings (20 bookings)
 INSERT INTO municipal.booking (status, booking_date, user_id)

@@ -748,8 +748,8 @@ begin
 
         declare @errorMessage nvarchar(4000) = error_message();
         declare @errorSeverity int = error_severity()
-        declare @error_state int = error_state()
-        raiserror(@errorMessage, @errorSeverity, @error_state);
+        declare @errorState int = error_state()
+        raiserror(@errorMessage, @errorSeverity, @errorState);
     end catch;
 end;
 go

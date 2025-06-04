@@ -20,9 +20,10 @@ class BookingDetails(NamedTuple):
   booked_count: int
 
 # Implemented with SP (the SP makes all the verifications needed)
-def create_booking(user_id: int, session_id: int) -> bool:
+def create_booking(user_id: int, session_id: int) -> int:
   """Calls the createBooking SP that creates a booking with all security checks"""
   with create_connection() as conn:
+    conn.autocommit = True
     cursor = conn.cursor()
 
     # Call SP and capture return code
@@ -41,10 +42,8 @@ def create_booking(user_id: int, session_id: int) -> bool:
     
     rc = row[0] # integer 0-7
 
-    # Commit is safe, since the SP handles it's own transaction rollback
-    conn.commit()
 
-    return (rc == 0) # 0 is the success value, anything else is failure
+    return rc # 0 is the success value, anything else is failure
 
 
 

@@ -34,6 +34,9 @@ IF OBJECT_ID('municipal.createBooking', 'P') IS NOT NULL
 IF OBJECT_ID('municipal.deleteUser', 'P') IS NOT NULL
     DROP PROCEDURE municipal.deleteUser;
 
+IF OBJECT_ID('municipal.deleteBooking', 'P') IS NOT NULL
+    DROP PROCEDURE municipal.deleteBooking;
+
 -- Drop Functions
 -- If SearchSessions is a scalar function (FN), a multi-statement TVF (TF),
 -- or an inline TVF (IF), drop it accordingly:

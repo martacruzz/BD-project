@@ -21,7 +21,7 @@ def booking_details(booking_id):
     return render_template("booking/booking_details.html", booking=booking)
 
 # Route for delete
-@bp.route("/<int:booking_id>/delete", methods=["POST"])
+@bp.route("/delete/<int:booking_id>", methods=["DELETE"])
 def delete_booking_route(booking_id):
   success = delete_booking(booking_id)
   if not success:

@@ -23,7 +23,7 @@
     </button>
     <!-- Cancel Button -->
     <button class="px-4 py-2 bg-red-600 text-white text-sm rounded-lg hover:bg-red-700 transition"
-      hx-delete="/bookings/{{ booking.booking_id }}" hx-confirm="Are you sure you want to cancel this booking?">
+      hx-delete="/bookings/delete/{{ booking.booking_id }}" hx-confirm="Are you sure you want to cancel this booking?">
       Cancel
     </button>
 
