@@ -1,5 +1,5 @@
 -- Trigger to prevent duplicate bookings
-create trigger trg_prevent_duplicate_booking
+create trigger municipal.trg_prevent_duplicate_booking
 on municipal.has
 instead of insert
 as
