@@ -17,7 +17,7 @@ def delete_booking_route(booking_id):
   success = delete_booking(booking_id)
   if not success:
      abort(404, description="Booking not found or could not be deleted")
-  return redirect(url_for('bookings.home'))
+  return redirect(url_for('home'))
 
 # route for searching bookings
 @bp.route('/search')

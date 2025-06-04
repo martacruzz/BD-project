@@ -62,10 +62,6 @@ def remove_from_cart(session_id):
 
 @bp.route("/confirm", methods=["POST"])
 def create_multiple_bookings():
-    """
-    Tries to create a booking for each session in the user's cart.
-    Builds a summary message based on each SP return‐code, then clears the cart.
-    """
     if 'cart' not in session or not session['cart']:
         return "No sessions to book.", 400
 
@@ -74,7 +70,6 @@ def create_multiple_bookings():
     success_count = 0
     errors = []
 
-    # Map SP return‐codes to human messages:
     rc_to_msg = {
         1: "Session not found.",
         2: "Session full.",
@@ -85,33 +80,25 @@ def create_multiple_bookings():
         7: "Unknown session type."
     }
 
-    # Loop through each session_id in the cart and call the SP:
     for session_id in session['cart']:
         rc = booking.create_booking(user_id, session_id)
         if rc == 0:
             success_count += 1
         else:
-            # Collect a failure message for this session:
             msg = rc_to_msg.get(rc, "Unknown error.")
             errors.append(f"Session {session_id}: {msg}")
 
-    # Clear the cart now that we attempted all bookings:
     session['cart'] = []
     session.modified = True
 
-    # Build a single “popup”‐style message:
     if success_count and not errors:
-        # All succeeded
         full_message = f"All {success_count} booking(s) confirmed successfully!"
     elif success_count and errors:
-        # Some succeeded, some failed
         errs = " ".join(errors)
         full_message = f"{success_count} booking(s) succeeded. Failed: {errs}"
     else:
-        # None succeeded
         full_message = "No bookings succeeded. " + " ".join(errors)
 
-    # Pass that message into your template for a popup or banner:
     return render_template(
         "session/booking_cart_items.html",
         sessions=[],
@@ -120,15 +107,10 @@ def create_multiple_bookings():
 
 @bp.route("/filter", methods=["POST"])
 def filter_route():
-    """
-    Accepts form data from the filter form (date, type, instructor, min_duration, max_duration),
-    calls persistence.sessionn.filter_sessions(), and returns the updated session list HTML.
-    """
-    # Read filter parameters from the form (they may be empty strings)
+
     sType = request.form.get("type") or None
     instructor_name = request.form.get("instructor") or None
 
-    # Parse durations into ints if provided, else None
     try:
         duration_min = int(request.form["min_duration"]) if request.form.get("min_duration") else None
     except ValueError:
@@ -139,12 +121,11 @@ def filter_route():
     except ValueError:
         return "Invalid maximum duration", 400
 
-    # Parse date (YYYY-MM-DD) or None
+
     search_date = request.form.get("date") or None
 
-    # Call your filtering function
     try:
-        filtered = session.filter_sessions(
+        filtered = sessionn.filter_sessions(
             sType=sType,
             instructor_name=instructor_name,
             duration_min=duration_min,
@@ -152,8 +133,7 @@ def filter_route():
             search_date=search_date
         )
     except Exception as e:
-        # If something goes wrong in SQL or Python, return 500
         return f"Filter error: {str(e)}", 500
 
-    # Render the session cards partial (session_list.html) with the filtered sessions
+
     return render_template("session/session_list.html", sessions=filtered)

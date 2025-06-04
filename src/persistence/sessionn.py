@@ -47,31 +47,20 @@ def list_all() -> list[SessionDescriptor]:
 
     return [SessionDescriptor(*row) for row in cursor.fetchall()]
 
-def filter_sessions(
-    sType: str = None, 
-    instructor_name: str = None, 
-    duration_min: int = None, 
-    duration_max: int = None, 
-    search_date: str = None
-  ) -> list[SessionDescriptor]:
+def filter_sessions(sType: str = None, instructor_name: str = None, duration_min: int = None, duration_max: int = None, search_date: str = None) -> list[SessionDescriptor]:
   """Lists all sessions that apply with a certain filter"""
 
   with create_connection() as conn:
     cursor = conn.cursor()
     
-    # Call the UDF with filtered parameters
     cursor.execute("""
       select 
         session_id,
-        duration,
-        date_time,
         sType,
-        max_capacity,
-        instructor_id,
+        date_time,
         instructor_name,
-        lane_number,
-        pool_id,
         pool_name,
+        lane_number,
         lane_status
       from municipal.SearchSessions(?, ?, ?, ?, ?)
       order by date_time;
