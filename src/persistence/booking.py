@@ -70,7 +70,7 @@ def get_booking_details(booking_id: int) -> BookingDetails | None:
       JOIN municipal.lane l ON s.pool_id = l.pool_id AND s.lane_number = l.lane_number
       LEFT JOIN municipal.payment pmt ON pmt.user_id = b.user_id
       WHERE b.booking_id = ?
-    """, (booking_id,))
+    """, (booking_id))
 
     row = cursor.fetchone()
     if row:
