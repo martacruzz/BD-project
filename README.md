@@ -29,3 +29,5 @@ Make sure you define these 2 environment variables:
 If not on a virtual environemnt open one with: `poetry shell`
 
 To run the application, use the following command: `flask run --debug`
+
+Also, if not running on linux (with SQL DRIVER: ODBC Driver 18 for SQL Server), change this line in persistence/session.py to {{SQL Server}}
